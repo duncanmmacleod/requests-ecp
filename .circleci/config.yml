@@ -76,6 +76,7 @@ aliases:
           set -x;
           yum -y -q update;
           yum -y -q install epel-release;
+          yum -y -q update;
           yum -y -q install \
               rpm-build \
               yum-utils \
@@ -102,8 +103,6 @@ aliases:
               echo "- Requires:"
               rpm -qp --requires ${_rpm};
           done;
-          # remove epel
-          yum -y -q remove epel-release;
 
   - &centos_install
       run:
@@ -139,7 +138,6 @@ aliases:
           else
               PYXY="${PYTHON_VERSION:0:1}";
           fi;
-          yum -y -q install epel-release;
           yum -y -q install \
               which \
               python${PYXY}-pytest \
