@@ -62,9 +62,9 @@ aliases:
         command: |
           PYM="${PYTHON_VERSION:0:1}"
           if [[ "${PYM}" -eq 2 ]]; then
-              DEB="python-requests-ecp*.deb"
+              DEB="python-requests-ecp.deb";
           else
-              DEB="python${PYM}-requests-ecp*.deb"
+              DEB="python${PYM}-requests-ecp.deb";
           dpkg --install ${DEB} || { \
               apt-get -y -f install;
               dpkg --install ${DEB};
