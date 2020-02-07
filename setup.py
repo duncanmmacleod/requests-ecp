@@ -92,7 +92,10 @@ setup(
         "requests-kerberos",  # ISC
     ],
     tests_require=[
+        "mock ; python_version < '3'",
         "pytest",
+        "pytest-cov",
+        "requests-mock",
     ],
     extras_require={
         "docs": [
