@@ -75,6 +75,8 @@ The Python %{python3_version} %{name} library.
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 7
+# old setuptools does not support environment markers:
+sed -i "/ ; /s/ ;.*/\",/g" setup.py
 # build python2
 %py2_build
 %else
