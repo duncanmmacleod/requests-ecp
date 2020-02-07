@@ -43,6 +43,12 @@ from requests.cookies import extract_cookies_to_jar
 
 from lxml import etree
 
+__all__ = [
+    "HTTPECPAuth",
+    "ECPAuthSessionMixin",
+    "Session",
+]
+
 
 def _get_xml_attribute(xdata, path):
     """Parse an attribute from an XML document
