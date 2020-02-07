@@ -19,10 +19,11 @@
 """Auth plugin for ECP requests
 """
 
+from __future__ import print_function
+
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 __version__ = "0.1.0"
 
-import sys
 from getpass import getpass
 
 try:
