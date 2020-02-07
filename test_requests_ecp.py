@@ -71,7 +71,7 @@ class TestHTTPECPAuth(object):
             kerberos=True,
         )
         assert isinstance(auth, HTTPKerberosAuth)
-        assert auth.principal == "HTTP@idp.test.com"
+        assert auth.hostname_override == "idp.test.com"
 
     def test_init_auth_kerberos_url(self):
         auth = self.TEST_CLASS._init_auth(
@@ -79,7 +79,7 @@ class TestHTTPECPAuth(object):
             kerberos="https://kerberos.test.com/idp/",
         )
         assert isinstance(auth, HTTPKerberosAuth)
-        assert auth.principal == "HTTP@kerberos.test.com"
+        assert auth.hostname_override == "kerberos.test.com"
 
     @pytest.mark.parametrize("location", [
         "https://idp.test.com/?SAMLRequest=12345",
