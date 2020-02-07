@@ -347,5 +347,5 @@ class Session(ECPAuthSessionMixin, _Session):
             self,
             endpoint=endpoint,
             url=url,
-            **kwargs,
+            **kwargs
         )
