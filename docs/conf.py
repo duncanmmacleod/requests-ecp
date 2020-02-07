@@ -18,17 +18,17 @@ from sphinx.ext.apidoc import main as apidoc_main
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-from ciecplib import __version__ as ciecplib_version
+from requests_ecp import __version__ as requests_ecp_version
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'ciecplib'
-copyright = '2019, Duncan Macleod'
+project = 'requests-ecp'
+copyright = '2020, Cardiff University'
 author = 'Duncan Macleod'
 
 # The full version, including alpha/beta/rc tags
-release = ciecplib_version
+release = requests_ecp_version
 
 
 # -- General configuration ---------------------------------------------------
