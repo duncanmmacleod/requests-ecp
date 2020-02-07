@@ -48,6 +48,13 @@ def read(path):
         return fobj.read()
 
 
+TESTS_REQUIRE = [
+    "mock ; python_version < '3'",
+    "pytest",
+    "pytest-cov",
+    "requests-mock",
+]
+
 setup(
     # distribution metadata
     name="requests-ecp",
@@ -91,13 +98,9 @@ setup(
         "requests",  # Apache-2.0
         "requests-kerberos",  # ISC
     ],
-    tests_require=[
-        "mock ; python_version < '3'",
-        "pytest",
-        "pytest-cov",
-        "requests-mock",
-    ],
+    tests_require=TESTS_REQUIRE,
     extras_require={
+        "test": TESTS_REQUIRE,
         "docs": [
             "sphinx",
             "sphinx-argparse",
