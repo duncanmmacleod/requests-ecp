@@ -65,6 +65,7 @@ aliases:
               DEB="python-requests-ecp.deb";
           else
               DEB="python${PYM}-requests-ecp.deb";
+          fi;
           dpkg --install ${DEB} || { \
               apt-get -y -f install;
               dpkg --install ${DEB};
