@@ -334,6 +334,7 @@ class ECPAuthSessionMixin(object):
             password=password,
         )
 
+
 class Session(ECPAuthSessionMixin, _Session):
     """A `requests.Session` with default ECP authentication
     """
