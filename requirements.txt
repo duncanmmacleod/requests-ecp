@@ -1,0 +1,8 @@
+# development requirements for requests-ecp
+lxml
+pytest
+pytest-cov
+requests
+requests-kerberos
+requests-mock
+setuptools
