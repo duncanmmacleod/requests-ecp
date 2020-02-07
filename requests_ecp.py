@@ -110,6 +110,27 @@ class HTTPECPAuth(requests_auth.AuthBase):
             username,
         ))
 
+    # -- utilities ----------
+
+    def _report_soap_fault(self, connection, url, **kwargs):
+        """Report a problem with the SOAP configuration of SP/IdP pair
+        """
+        request = Request(
+            method="POST",
+            url=url,
+            headers={'Content-Type': 'application/vnd.paos+xml'},
+            data="""
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <S:Fault>
+      <faultcode>S:Server</faultcode>
+      <faultstring>responseConsumerURL from SP and assertionConsumerServiceURL from IdP do not match</faultstring>
+    </S:Fault>
+  </S:Body>
+</S:Envelope>""", # noqa
+        ).prepare()
+        return connection.send(request, **kwargs)
+
     # -- auth method --------
 
     def authenticate(self, session, endpoint=None, url=None, **kwargs):
@@ -217,7 +238,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
         # validate URLs between SP and IdP
         if acsurl != rcurl:
             try:
-                self.report_soap_fault(rcurl)
+                self._report_soap_fault(connection, rcurl)
             except URLError:
                 pass  # don't care, just doing a service
 
