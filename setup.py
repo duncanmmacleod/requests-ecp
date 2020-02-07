@@ -94,4 +94,13 @@ setup(
     tests_require=[
         "pytest",
     ],
+    extras_require={
+        "docs": [
+            "sphinx",
+            "sphinx-argparse",
+            "sphinx_automodapi",
+            "sphinx_rtd_theme",
+            "sphinx_tabs",
+        ],
+    },
 )
