@@ -24,7 +24,7 @@ Depends:
  ${misc:Depends},
  ${python:Depends},
  python-lxml,
- python-requests
+ python-requests,
  python-requests-kerberos,
 Description: A SAML/ECP authentication handler for Requests
 
@@ -37,6 +37,6 @@ Depends:
  ${misc:Depends},
  ${python3:Depends},
  python3-lxml,
- python3-requests
+ python3-requests,
  python3-requests-kerberos,
 Description: A SAML/ECP authentication handler for Requests
