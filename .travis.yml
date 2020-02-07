@@ -43,7 +43,7 @@ install:
   - python -m pip install --editable .
 
 script:
-  - python -m pytest --verbose --cov --pyargs requests_ecp
+  - python -m pytest -rs --verbose --cov requests_ecp test_requests_ecp.py
 
 after_success:
   - travis_retry conda install --quiet --yes --name ci codecov
