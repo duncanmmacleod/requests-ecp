@@ -212,7 +212,6 @@ aliases:
       steps:
         - checkout
         - *attach_workspace
-        - *install_build_dependencies
         - *install
         - *test
         - *coverage_report
@@ -320,7 +319,6 @@ jobs:
       - image: python:3.7
     steps:
       - checkout
-      - *install_build_dependencies
       - run:
           name: Install
           command: python -m pip install --progress-bar=off .[docs]
