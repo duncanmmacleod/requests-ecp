@@ -1,0 +1,42 @@
+# -- requests-ecp source package ----------------------------------------------
+
+Source: requests-ecp
+Section: python
+Priority: optional
+Maintainer: Duncan Macleod <duncan.macleod@ligo.org>
+Standards-Version: 4.2.1
+X-Python-Version: >= 2.7
+X-Python3-Version: >= 3.4
+Homepage: https://github.com/duncanmmacleod/requests-ecp
+Build-Depends:
+ debhelper (>= 9),
+ dh-python,
+ python-all,
+ python-setuptools,
+ python3-all,
+ python3-setuptools,
+
+# -- python-requests-ecp ------------------------------------------------------
+
+Package: python-requests-ecp
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${python:Depends},
+ python-lxml,
+ python-requests
+ python-requests-kerberos,
+Description: A SAML/ECP authentication handler for Requests
+
+# -- python3-requests-ecp -----------------------------------------------------
+# requires buster-backports or newer
+
+Package: python3-requests-ecp
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+ python3-lxml,
+ python3-requests
+ python3-requests-kerberos,
+Description: A SAML/ECP authentication handler for Requests

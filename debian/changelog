@@ -1,0 +1,5 @@
+requests-ecp (0.1.0-1) unstable; urgency=low
+
+  * first release
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Fri, 07 Feb 2020 10:29:00 +0000
