@@ -96,7 +96,7 @@ setup(
     install_requires=[
         "lxml",  # BSD
         "requests",  # Apache-2.0
-        "requests-kerberos",  # ISC
+        "requests-kerberos >= 0.9.0",  # ISC
     ],
     tests_require=TESTS_REQUIRE,
     extras_require={
