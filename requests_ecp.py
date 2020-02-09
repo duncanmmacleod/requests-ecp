@@ -105,15 +105,10 @@ class HTTPECPAuth(requests_auth.AuthBase):
             from requests_kerberos import HTTPKerberosAuth
             url = kerberos if isinstance(kerberos, str) else idp
             loginhost = urllib_parse.urlparse(url).netloc.split(':')[0]
-            try:
-                return HTTPKerberosAuth(
-                    force_preemptive=True,
-                    hostname_override=loginhost,
-                )
-            except TypeError:  # probably old requests-kerberos mod
-                return HTTPKerberosAuth(
-                    hostname_override=loginhost,
-                )
+            return HTTPKerberosAuth(
+                force_preemptive=True,
+                hostname_override=loginhost,
+            )
         elif username and password:
             return requests_auth.HTTPBasicAuth(username, password)
         return requests_auth.HTTPBasicAuth(*_prompt_username_password(
