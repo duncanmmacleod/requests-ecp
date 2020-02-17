@@ -272,6 +272,13 @@ jobs:
     environment:
       PYTHON_VERSION: "3.7"
 
+  debian:bullseye:3.7:
+    <<: *debian
+    docker:
+      - image: debian:bullseye
+    environment:
+      PYTHON_VERSION: "3.7"
+
   #centos:7:2.7:
   #  <<: *centos
   #  docker:

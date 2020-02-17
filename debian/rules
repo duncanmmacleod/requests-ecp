@@ -2,7 +2,13 @@
 
 include /usr/share/dpkg/pkg-info.mk
 
+HAVE_PYTHON2 := $(if $(shell pyversions -r),yes)
+HAVE_PYTHON3 := $(if $(shell py3versions -r),yes)
+
 export PYBUILD_NAME = requests-ecp
 
 %:
-	dh $@ --with python2,python3 --buildsystem=pybuild
+	dh $@ \
+	    $(if $(HAVE_PYTHON2),--with=python2) \
+	    $(if $(HAVE_PYTHON3),--with=python3) \
+	    --buildsystem=pybuild
