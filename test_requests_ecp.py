@@ -137,7 +137,8 @@ class TestHTTPECPAuth(object):
         with requests.Session() as session:
             session.auth = self.TEST_CLASS(
                 idp="test",
-                kerberos=True,  # no prompts
+                username="user",
+                password="passwd",
             )
             session.get("https://test")
         assert session.auth._num_ecp_auth == 0
