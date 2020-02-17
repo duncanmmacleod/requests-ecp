@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - lxml
+  - pip
   - python>=3
   - requests
   - requests-kerberos>=0.9.0
