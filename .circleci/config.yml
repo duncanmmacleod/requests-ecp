@@ -341,9 +341,9 @@ workflows:
     jobs:
       - sdist
       - flake8
-      #- centos:7:2.7:
-      #    requires:
-      #      - sdist
+      - centos:7:2.7:
+          requires:
+            - sdist
       - centos:8:3.6:
           requires:
             - sdist
