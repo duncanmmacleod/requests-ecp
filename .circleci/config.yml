@@ -353,6 +353,9 @@ workflows:
       - debian:buster:3.7:
           requires:
             - sdist
+      - debian:bullseye:3.7:
+          requires:
+            - sdist
       - python:2.7:
           requires:
             - sdist
