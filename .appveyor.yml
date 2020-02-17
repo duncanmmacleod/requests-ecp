@@ -1,0 +1,29 @@
+environment:
+  matrix:
+    - MINICONDA: C:\Miniconda37-x64
+      PYTHON_VERSION: 3.8
+    - MINICONDA: C:\Miniconda37-x64
+      PYTHON_VERSION: 3.7
+    - MINICONDA: C:\Miniconda36-x64
+      PYTHON_VERSION: 3.6
+install:
+  - "set PATH=%MINICONDA%\\condabin;%PATH%"
+  - call "%MINICONDA%\\Scripts\\activate.bat"
+  - conda config --set always_yes yes
+  - conda config --add channels conda-forge
+  - conda create --name test "python=%PYTHON_VERSION%"
+  - conda install --quiet --yes --update-deps --name ci --file requirements.txt
+  - conda activate test
+  - conda info
+  - conda list
+build_script:
+  - python -m pip install .
+test_script:
+  # run automated tests
+  - python -m pytest -rs --verbose --cov requests_ecp test_requests_ecp.py --cov-report "" --junitxml=junit.xml
+after_test:
+  - python -m coverage report
+  - python -m pip install codecov
+  - python -m codecov --flags Windows python%PYTHON_VERSION:.=% conda
+on_finish:
+  - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\junit.xml))
