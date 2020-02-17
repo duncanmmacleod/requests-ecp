@@ -11,9 +11,9 @@ install:
   - call "%MINICONDA%\\Scripts\\activate.bat"
   - conda config --set always_yes yes
   - conda config --add channels conda-forge
-  - conda create --name test "python=%PYTHON_VERSION%"
+  - conda create --name ci "python=%PYTHON_VERSION%"
   - conda install --quiet --yes --update-deps --name ci --file requirements.txt
-  - conda activate test
+  - conda activate ci
   - conda info
   - conda list
 build_script:
