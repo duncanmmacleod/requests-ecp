@@ -1,0 +1,15 @@
+name: requests-ecp
+channels:
+  - conda-forge
+dependencies:
+  - lxml
+  - python>=3
+  - requests
+  - requests-kerberos>=0.9.0
+  - requests-mock
+  - setuptools
+  - sphinx
+  - sphinx-automodapi
+  - sphinx_rtd_theme
+  - pip:
+    - sphinx_tabs
