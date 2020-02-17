@@ -24,6 +24,7 @@ from __future__ import print_function
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 __version__ = "0.1.0"
 
+from distutils.version import LooseVersion
 from getpass import getpass
 
 try:
@@ -53,6 +54,8 @@ __all__ = [
     "ECPAuthSessionMixin",
     "Session",
 ]
+
+REQUESTS_KERBEROS_VERSION = LooseVersion(REQUESTS_KERBEROS_VERSION)
 
 
 def _get_xml_attribute(xdata, path):
