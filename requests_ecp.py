@@ -41,6 +41,11 @@ from requests import (
 )
 from requests.cookies import extract_cookies_to_jar
 
+from requests_kerberos import (
+    __version__ as REQUESTS_KERBEROS_VERSION,
+    HTTPKerberosAuth,
+)
+
 from lxml import etree
 
 __all__ = [
@@ -102,13 +107,21 @@ class HTTPECPAuth(requests_auth.AuthBase):
     @staticmethod
     def _init_auth(idp, kerberos=False, username=None, password=None):
         if kerberos:
-            from requests_kerberos import HTTPKerberosAuth
             url = kerberos if isinstance(kerberos, str) else idp
             loginhost = urllib_parse.urlparse(url).netloc.split(':')[0]
-            return HTTPKerberosAuth(
-                force_preemptive=True,
-                hostname_override=loginhost,
-            )
+            try:
+                return HTTPKerberosAuth(
+                    force_preemptive=True,
+                    hostname_override=loginhost,
+                )
+            except TypeError as exc:  # old requests mod
+                if REQUESTS_KERBEROS_VERSION < "0.9.0":
+                    raise RuntimeError(
+                        "failed to initialise kerberos authentication, "
+                        "requests-kerberos is too old, "
+                        "please upgrade to 0.9.0 or later"
+                    )
+                raise
         elif username and password:
             return requests_auth.HTTPBasicAuth(username, password)
         return requests_auth.HTTPBasicAuth(*_prompt_username_password(
