@@ -117,7 +117,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
                     force_preemptive=True,
                     hostname_override=loginhost,
                 )
-            except TypeError as exc:  # old requests mod
+            except TypeError:  # old requests-kerberos mod?
                 if REQUESTS_KERBEROS_VERSION < "0.9.0":
                     raise RuntimeError(
                         "failed to initialise kerberos authentication, "
