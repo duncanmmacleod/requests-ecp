@@ -1,5 +1,5 @@
 %define name requests-ecp
-%define version 0.1.0
+%define version 0.1.1
 %define release 1
 
 # -- metadata ---------------
@@ -115,5 +115,8 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Mon Feb 17 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.1.1-1
+- bug-fix release
+
 * Fri Feb 7 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.1.0-1
 - first release
