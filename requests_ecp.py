@@ -72,7 +72,7 @@ def _get_xml_attribute(xdata, path):
 def _prompt_username_password(host, username=None):
     """Prompt for a username and password from the console
     """
-    if username is None:
+    if not username:
         username = input("Enter username for {0}: ".format(host))
     password = getpass(
         "Enter password for {0!r} on {1}: ".format(username, host),
@@ -86,8 +86,8 @@ class HTTPECPAuth(requests_auth.AuthBase):
             idp,
             force_auth=False,
             kerberos=False,
-            username=False,
-            password=False,
+            username=None,
+            password=None,
     ):
         #: Address of Identity Provider ECP endpoint.
         self.idp = idp
