@@ -17,7 +17,7 @@ Installation
 
           $ conda install -c conda-forge requests-ecp
 
-      Supported python versions: 2.7, 3.6+.
+      Supported python versions: 3.6+.
 
    .. tab:: Pip
 
@@ -25,7 +25,7 @@ Installation
 
           $ python -m pip install requests-ecp
 
-      Supported python versions: 2.7, 3.5+.
+      Supported python versions: 3.5+.
 
 ==================
 User documentation

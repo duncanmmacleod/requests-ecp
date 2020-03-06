@@ -19,21 +19,13 @@
 """Auth plugin for ECP requests
 """
 
-from __future__ import print_function
-
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 __version__ = "0.1.1"
 
 from distutils.version import LooseVersion
 from getpass import getpass
-
-try:
-    from urllib import parse as urllib_parse
-    from urllib.error import URLError
-except ImportError:  # python < 3
-    import urlparse as urllib_parse
-    from urllib2 import URLError
-    input = raw_input  # noqa: F821
+from urllib import parse as urllib_parse
+from urllib.error import URLError
 
 from requests import (
     auth as requests_auth,
@@ -112,19 +104,10 @@ class HTTPECPAuth(requests_auth.AuthBase):
         if kerberos:
             url = kerberos if isinstance(kerberos, str) else idp
             loginhost = urllib_parse.urlparse(url).netloc.split(':')[0]
-            try:
-                return HTTPKerberosAuth(
-                    force_preemptive=True,
-                    hostname_override=loginhost,
-                )
-            except TypeError:  # old requests-kerberos mod?
-                if REQUESTS_KERBEROS_VERSION < "0.9.0":
-                    raise RuntimeError(
-                        "failed to initialise kerberos authentication, "
-                        "requests-kerberos is too old, "
-                        "please upgrade to 0.9.0 or later"
-                    )
-                raise
+            return HTTPKerberosAuth(
+                force_preemptive=True,
+                hostname_override=loginhost,
+            )
         elif username and password:
             return requests_auth.HTTPBasicAuth(username, password)
         return requests_auth.HTTPBasicAuth(*_prompt_username_password(
@@ -337,7 +320,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
         return request
 
 
-class ECPAuthSessionMixin(object):
+class ECPAuthSessionMixin:
     """A mixin for `requests.Session` to add default ECP Auth
     """
     def __init__(
@@ -348,7 +331,7 @@ class ECPAuthSessionMixin(object):
             password=None,
             **kwargs
     ):
-        super(ECPAuthSessionMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.auth = HTTPECPAuth(
             idp,
             kerberos=kerberos,

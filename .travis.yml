@@ -4,7 +4,7 @@ matrix:
   fast_finish: true
   include:
     - os: linux
-      env: PYTHON_VERSION="2.7"
+      env: PYTHON_VERSION="3.5"
     - os: linux
       env: PYTHON_VERSION="3.6"
     - os: linux
@@ -12,7 +12,7 @@ matrix:
     - os: linux
       env: PYTHON_VERSION="3.8"
     - os: osx
-      env: PYTHON_VERSION="2.7"
+      env: PYTHON_VERSION="3.5"
     - os: osx
       env: PYTHON_VERSION="3.6"
     - os: osx
@@ -35,13 +35,14 @@ before_install:
 
 install:
   # create a conda environment including our requirements
-  - travis_retry conda create --quiet --name ci python=${PYTHON_VERSION}
+  - travis_retry conda create --quiet --name ci python=${PYTHON_VERSION} pip
   - travis_retry conda activate ci
   # install testing dependencies with conda
-  - travis_retry conda install --quiet --yes --update-deps --name ci --file requirements.txt
-  - if [ "${PYTHON_VERSION/./}" -lt 30 ]; then travis_retry conda install --quiet --yes --name ci mock; fi
+  - travis_retry conda install --quiet --yes --name ci --file requirements.txt
   # install this version
   - python -m pip install --editable .
+  # print package info
+  - conda list
 
 script:
   - python -m pytest -rs --verbose --cov requests_ecp test_requests_ecp.py
