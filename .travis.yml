@@ -4,7 +4,7 @@ matrix:
   fast_finish: true
   include:
     - os: linux
-      env: PYTHON_VERSION="2.7"
+      env: PYTHON_VERSION="3.5"
     - os: linux
       env: PYTHON_VERSION="3.6"
     - os: linux
@@ -12,7 +12,7 @@ matrix:
     - os: linux
       env: PYTHON_VERSION="3.8"
     - os: osx
-      env: PYTHON_VERSION="2.7"
+      env: PYTHON_VERSION="3.5"
     - os: osx
       env: PYTHON_VERSION="3.6"
     - os: osx

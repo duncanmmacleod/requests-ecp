@@ -49,10 +49,9 @@ def read(path):
 
 
 TESTS_REQUIRE = [
-    "mock ; python_version < '3'",
-    "pytest",
+    "pytest >= 2.9.2",
     "pytest-cov",
-    "requests-mock",
+    "requests-mock >= 1.5.0",
 ]
 
 setup(
@@ -77,7 +76,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
@@ -90,6 +88,7 @@ setup(
         "requests_ecp",
     ],
     # dependencies
+    python_requires=">=3.5",
     setup_requires=[
         "setuptools",  # MIT
     ],
