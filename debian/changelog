@@ -1,3 +1,10 @@
+requests-ecp (0.2.0-1) unstable; urgency=low
+
+  * development release
+  * removed python2 support
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Mon, 09 Mar 2020 15:00:00 +0000
+
 requests-ecp (0.1.1-1) unstable; urgency=low
 
   * bug-fix release
