@@ -76,16 +76,12 @@ class HTTPECPAuth(requests_auth.AuthBase):
     def __init__(
             self,
             idp,
-            force_auth=False,
             kerberos=False,
             username=None,
             password=None,
     ):
         #: Address of Identity Provider ECP endpoint.
         self.idp = idp
-
-        #: If `True` force authentication each time.
-        self.force_auth = force_auth
 
         #: Authentication object to attach to requests made directly
         #: to the IdP.
