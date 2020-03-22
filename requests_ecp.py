@@ -85,12 +85,10 @@ class HTTPECPAuth(requests_auth.AuthBase):
 
         #: Authentication object to attach to requests made directly
         #: to the IdP.
-        self._idpauth = self._init_auth(
-            self.idp,
-            kerberos=kerberos,
-            username=username,
-            password=password,
-        )
+        self.kerberos = kerberos
+        self.username = username
+        self.password = password
+        self._idpauth = None
 
         #: counter for authentication attemps for a single request
         self._num_ecp_auth = 0
@@ -162,6 +160,14 @@ class HTTPECPAuth(requests_auth.AuthBase):
         """
         endpoint = endpoint or self.idp
         target = url or endpoint
+
+        if self._idpauth is None:
+            self._idpauth = self._init_auth(
+                self.idp,
+                kerberos=self.kerberos,
+                username=self.username,
+                password=self.password,
+            )
 
         # -- step 1: initiate ECP request -----------
 
