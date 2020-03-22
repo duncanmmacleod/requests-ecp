@@ -191,9 +191,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
         finally:
             resp1.raw.release_conn()
 
-        with open("test.xml", "w") as xml:
-            print(resp1.text, file=xml)
-
         # pick out the relay state element from the SP so that it can
         # be included later in the response to the SP
         relaystate = _get_xml_attribute(
@@ -238,9 +235,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
             idptree,
             "/S:Envelope/S:Header/ecp:Response/@AssertionConsumerServiceURL",
         )
-
-        with open("test2.xml", "w") as xml:
-            print(resp2.text, file=xml)
 
         # validate URLs between SP and IdP
         if acsurl != rcurl:
