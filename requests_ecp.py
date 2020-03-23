@@ -76,7 +76,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
     def __init__(
             self,
             idp,
-            force_auth=False,
             kerberos=False,
             username=None,
             password=None,
@@ -84,17 +83,12 @@ class HTTPECPAuth(requests_auth.AuthBase):
         #: Address of Identity Provider ECP endpoint.
         self.idp = idp
 
-        #: If `True` force authentication each time.
-        self.force_auth = force_auth
-
         #: Authentication object to attach to requests made directly
         #: to the IdP.
-        self._idpauth = self._init_auth(
-            self.idp,
-            kerberos=kerberos,
-            username=username,
-            password=password,
-        )
+        self.kerberos = kerberos
+        self.username = username
+        self.password = password
+        self._idpauth = None
 
         #: counter for authentication attemps for a single request
         self._num_ecp_auth = 0
@@ -167,6 +161,14 @@ class HTTPECPAuth(requests_auth.AuthBase):
         endpoint = endpoint or self.idp
         target = url or endpoint
 
+        if self._idpauth is None:
+            self._idpauth = self._init_auth(
+                self.idp,
+                kerberos=self.kerberos,
+                username=self.username,
+                password=self.password,
+            )
+
         # -- step 1: initiate ECP request -----------
 
         req1 = Request(
@@ -188,9 +190,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
             spetree = etree.XML(resp1.content)
         finally:
             resp1.raw.release_conn()
-
-        with open("test.xml", "w") as xml:
-            print(resp1.text, file=xml)
 
         # pick out the relay state element from the SP so that it can
         # be included later in the response to the SP
@@ -236,9 +235,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
             idptree,
             "/S:Envelope/S:Header/ecp:Response/@AssertionConsumerServiceURL",
         )
-
-        with open("test2.xml", "w") as xml:
-            print(resp2.text, file=xml)
 
         # validate URLs between SP and IdP
         if acsurl != rcurl:
