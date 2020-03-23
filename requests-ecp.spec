@@ -1,5 +1,5 @@
 %define name requests-ecp
-%define version 0.2.0
+%define version 0.2.1
 %define release 1
 
 # -- metadata ---------------
@@ -64,6 +64,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Mon Mar 23 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.1-1
+- update for 0.2.1
+
 * Mon Mar 09 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.0-1
 - development release
 - removed python2 support
