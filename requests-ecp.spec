@@ -6,13 +6,13 @@
 
 BuildArch: noarch
 Group:     Development/Libraries
-License:   GPL-3.0-or-later
+License:   GPLv3+
 Name:      %{name}
 Packager:  Duncan Macleod <duncan.macleod@ligo.org>
 Prefix:    %{_prefix}
 Release:   %{release}%{?dist}
 Source0:   %pypi_source
-Summary:   A SAML/ECP authentication handler for python-requests.
+Summary:   A SAML/ECP authentication handler for python-requests
 Url:       https://github.com/duncanmmacleod/requests-ecp
 Vendor:    Duncan Macleod <duncan.macleod@ligo.org>
 Version:   %{version}

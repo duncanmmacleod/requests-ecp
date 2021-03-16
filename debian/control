@@ -23,4 +23,8 @@ Depends:
  python3-lxml,
  python3-requests,
  python3-requests-kerberos (>= 0.9.0),
-Description: A SAML/ECP authentication handler for Requests
+Description: SAML/ECP authentication handler for Requests
+ requests-ecp adds optional SAML/ECP authentication support
+ for the python3-requests HTTP library.
+ .
+ This package provides the Python 3 module.
