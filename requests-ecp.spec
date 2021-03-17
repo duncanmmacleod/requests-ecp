@@ -23,6 +23,11 @@ BuildRequires: python-srpm-macros
 BuildRequires: python-rpm-macros
 BuildRequires: /usr/bin/python3
 BuildRequires: python3-rpm-macros
+BuildRequires: python%{python3_pkgversion}-lxml
+BuildRequires: python%{python3_pkgversion}-pytest
+BuildRequires: python%{python3_pkgversion}-requests
+BuildRequires: python%{python3_pkgversion}-requests-kerberos
+BuildRequires: python%{python3_pkgversion}-requests-mock
 BuildRequires: python%{python3_pkgversion}-setuptools
 
 # -- packages ---------------
@@ -50,6 +55,11 @@ The Python %{python3_version} %{name} library.
 
 %install
 %py3_install
+
+%check
+export PYTHONPATH="%{buildroot}%{python3_sitelib}"
+export PATH="%{buildroot}%{_bindir}:${PATH}"
+%{__python3} -m pytest --verbose -ra --pyargs requests_ecp
 
 %clean
 rm -rf $RPM_BUILD_ROOT
