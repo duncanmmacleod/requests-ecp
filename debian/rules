@@ -3,6 +3,8 @@
 include /usr/share/dpkg/pkg-info.mk
 
 export PYBUILD_NAME = requests-ecp
+export PYBUILD_OPTION = --test-pytest
+export PYBUILD_TEST_ARGS = --verbose -r a
 
 %:
 	dh $@ \
