@@ -20,8 +20,12 @@
 """
 
 import re
+from pathlib import Path
 
-from setuptools import setup
+from setuptools import (
+    find_packages,
+    setup
+)
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
@@ -57,7 +61,7 @@ TESTS_REQUIRE = [
 setup(
     # distribution metadata
     name="requests-ecp",
-    version=find_version("requests_ecp.py"),
+    version=find_version(Path("requests_ecp") / "__init__.py"),
     author="Duncan Macleod",
     author_email="duncan.macleod@ligo.org",
     license="GPL-3.0-or-later",
@@ -84,9 +88,7 @@ setup(
         'Topic :: Scientific/Engineering',
     ],
     # contents
-    py_modules=[
-        "requests_ecp",
-    ],
+    packages=find_packages(),
     # dependencies
     python_requires=">=3.5",
     setup_requires=[
