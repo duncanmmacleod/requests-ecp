@@ -213,6 +213,7 @@ jobs:
               epel-release \
               rpm-build \
           ;
+          yum -y -q install epel-rpm-macros
 
       - name: Create source package
         run: rpmbuild -ts --define "_srcrpmdir $(pwd)" ${TARBALL}
@@ -245,9 +246,11 @@ jobs:
       - name: Install build tools
         run: |
           yum -y -q install \
+              epel-release \
               rpm-build \
               yum-utils \
           ;
+          yum -y -q install epel-rpm-macros
 
       - name: Install build dependencies
         run: yum-builddep -y -q ${SRPM}
