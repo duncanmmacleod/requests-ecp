@@ -80,7 +80,7 @@ jobs:
       run: conda list --name test
 
     - name: Run test suite
-      run: python -m pytest -ra --color yes --cov requests_ecp test_requests_ecp.py --cov-report=xml --junitxml=pytest.xml
+      run: python -m pytest -ra --color yes --cov requests_ecp --pyargs requests_ecp --cov-report=xml --junitxml=pytest.xml
 
     - name: Coverage report
       run: python -m coverage report --show-missing
