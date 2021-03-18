@@ -76,7 +76,7 @@ default_role = 'obj'
 # -- Extensions --------------------------------------------------------------
 
 # Intersphinx directory
-interphinx_mapping = {
+intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "requests": ("https://requests.readthedocs.io/en/stable/", None),
 }
