@@ -1,4 +1,3 @@
 include LICENSE README.md MANIFEST.in
 include *.spec
-include test_requests_ecp.py
 recursive-include debian *
