@@ -28,7 +28,7 @@ BuildRequires: python%{python3_pkgversion}-pytest
 BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-requests-kerberos
 BuildRequires: python%{python3_pkgversion}-requests-mock
-BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
 
 # -- packages ---------------
 

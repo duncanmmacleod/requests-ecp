@@ -22,10 +22,7 @@
 import re
 from pathlib import Path
 
-from setuptools import (
-    find_packages,
-    setup
-)
+from setuptools import setup
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
@@ -45,69 +42,8 @@ def find_version(path, varname="__version__"):
     raise RuntimeError("Unable to find version string.")
 
 
-def read(path):
-    """Read the long description out of a file
-    """
-    with open(path, "r") as fobj:
-        return fobj.read()
-
-
-TESTS_REQUIRE = [
-    "pytest >= 2.9.2",
-    "pytest-cov",
-    "requests-mock >= 1.5.0",
-]
-
+# this function only manually specifies things that aren't
+# supported by setup.cfg (as of setuptools-30.3.0)
 setup(
-    # distribution metadata
-    name="requests-ecp",
     version=find_version(Path("requests_ecp") / "__init__.py"),
-    author="Duncan Macleod",
-    author_email="duncan.macleod@ligo.org",
-    license="GPL-3.0-or-later",
-    description="SAML/ECP authentication handler for python-requests",
-    long_description=read("README.md"),
-    long_description_content_type="text/markdown",
-    url="https://pypi.org/project/requests-ecp/",
-    project_urls={
-        "Bug Tracker": "https://github.com/duncanmmacleod/requests-ecp/issues",
-        "Documentation": "https://requests-ecp.readthedocs.io/",
-        "Source Code": "https://github.com/duncanmmacleod/requests-ecp/",
-    },
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Topic :: Scientific/Engineering',
-    ],
-    # contents
-    packages=find_packages(),
-    # dependencies
-    python_requires=">=3.5",
-    setup_requires=[
-        "setuptools",  # MIT
-    ],
-    install_requires=[
-        "lxml",  # BSD
-        "requests",  # Apache-2.0
-        "requests-kerberos",  # ISC
-    ],
-    tests_require=TESTS_REQUIRE,
-    extras_require={
-        "test": TESTS_REQUIRE,
-        "docs": [
-            "sphinx",
-            "sphinx-argparse",
-            "sphinx_automodapi",
-            "sphinx_rtd_theme",
-            "sphinx_tabs",
-        ],
-    },
 )
