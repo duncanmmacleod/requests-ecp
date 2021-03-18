@@ -33,7 +33,7 @@ __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 def find_version(path, varname="__version__"):
     """Parse the version metadata in the given file.
     """
-    with open(path, 'r') as fobj:
+    with Path(path).open('r') as fobj:
         version_file = fobj.read()
     version_match = re.search(
         r"^{0} = ['\"]([^'\"]*)['\"]".format(varname),
