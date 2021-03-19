@@ -4,7 +4,7 @@ A SAML/ECP authentication handler for python-requests.
 
 ## Release status
 
-[![PyPI version](https://badge.fury.io/py/requests-ecp.svg)](http://badge.fury.io/py/requests-ecp)
+[![PyPI version](https://img.shields.io/pypi/v/requests-ecp.svg)](https://pypi.python.org/pypi/requests-ecp)
 [![Conda version](https://img.shields.io/conda/vn/conda-forge/requests-ecp.svg)](https://anaconda.org/conda-forge/requests-ecp/)  
 [![DOI](https://zenodo.org/badge/238942798.svg)](https://zenodo.org/badge/latestdoi/238942798)
 [![License](https://img.shields.io/pypi/l/requests-ecp.svg)](https://choosealicense.com/licenses/gpl-3.0/)
