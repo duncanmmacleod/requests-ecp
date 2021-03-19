@@ -1,5 +1,5 @@
 %define name requests-ecp
-%define version 0.2.1
+%define version 0.2.2
 %define release 1
 
 # -- metadata ---------------
@@ -74,6 +74,11 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Fri Mar 19 2021 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.2-1
+- update for 0.2.2
+- tests are now bundled as part of the package
+- add pytest run during rpmbuild check stage
+
 * Mon Mar 23 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.1-1
 - update for 0.2.1
 

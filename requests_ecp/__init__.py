@@ -20,7 +20,7 @@
 """
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 from distutils.version import LooseVersion
 from getpass import getpass
