@@ -140,6 +140,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
             extract_cookies_to_jar(session.cookies, resp.request, resp.raw)
 
     def _authenticate_response(self, response, endpoint=None, **kwargs):
+        response.raw.read()
         response.raw.release_conn()
         return self._authenticate(
             response.connection,

@@ -139,3 +139,37 @@ class TestHTTPECPAuth(object):
             )
             session.get("https://test")
         assert session.auth._num_ecp_auth == 0
+
+    @mock.patch(
+        "requests_ecp.HTTPECPAuth.is_ecp_auth_redirect",
+        return_value=True,
+    )
+    @mock.patch(
+        "requests_ecp.HTTPECPAuth._authenticate",
+    )
+    def test_handle_response_auth(self, mock_authenticate, _, requests_mock):
+        requests_mock.get("https://test")
+        with requests.Session() as session:
+            session.auth = self.TEST_CLASS(
+                idp="test",
+                username="user",
+                password="passwd",
+            )
+            response = session.get("https://test", allow_redirects=False)
+        # assert that _authenticate got passed some stuff
+        # devwarning: this might be a bit flaky if requests change the api
+        mock_authenticate.assert_called_once_with(
+            response.connection,
+            endpoint=None,
+            url=response.url,
+            timeout=mock.ANY,
+            verify=mock.ANY,
+            proxies=mock.ANY,
+            stream=mock.ANY,
+            cert=mock.ANY,
+        )
+        # check that the header is hijacked properly to that requests
+        # automatically retries the same URL
+        assert response.headers['location'] == "https://test/"
+        # make sure that we log that we did the auth loop
+        assert session.auth._num_ecp_auth
