@@ -1,5 +1,5 @@
 %define name requests-ecp
-%define version 0.2.1
+%define version 0.2.2
 %define release 1
 
 # -- metadata ---------------
@@ -34,7 +34,8 @@ BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
 
 # src.rpm
 %description
-The Python client for SAML ECP authentication.
+requests-ecp adds optional SAML/ECP authentication support
+for the Requests Python library.
 
 %package -n python%{python3_pkgversion}-%{name}
 Summary: %{summary}
@@ -43,7 +44,9 @@ Requires: python%{python3_pkgversion}-requests
 Requires: python%{python3_pkgversion}-requests-kerberos
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
 %description -n python%{python3_pkgversion}-%{name}
-The Python %{python3_version} %{name} library.
+requests-ecp adds optional SAML/ECP authentication support
+for the Requests Python library.  This package provides
+the Python %{python3_version} library.
 
 # -- build ------------------
 
@@ -74,6 +77,11 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Fri Mar 19 2021 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.2-1
+- update for 0.2.2
+- tests are now bundled as part of the package
+- add pytest run during rpmbuild check stage
+
 * Mon Mar 23 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.1-1
 - update for 0.2.1
 
