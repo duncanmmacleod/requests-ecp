@@ -166,6 +166,37 @@ jobs:
             *.deb
           if-no-files-found: error
 
+  debian-install:
+    name: Debian ${{ matrix.debian }} install test
+    needs:
+      - debian-binary
+    strategy:
+      fail-fast: false
+      matrix:
+        debian:
+          - stretch-backports
+          - buster
+          - bullseye
+    runs-on: ubuntu-latest
+    container: debian:${{ matrix.debian }}
+    steps:
+      - name: Download binary packages
+        uses: actions/download-artifact@v2
+        with:
+          name: deb-${{ matrix.debian }}
+
+      - name: Configure apt
+        run: apt-get -y -q -q update
+
+      - name: Install packages
+        shell: bash -ex {0}
+        run: |
+          if [[ "${{ matrix.debian }}" == *backports ]]; then BACKPORTS="-t ${{ matrix.debian }}"; fi
+          dpkg --install *.deb || { \
+              apt-get -y -f ${BACKPORTS} install;
+              dpkg --install *.deb;
+          }
+
   lint-debian:
     name: Lint Debian packages
     runs-on: ubuntu-latest
@@ -282,6 +313,29 @@ jobs:
           name: rpm-centos-${{ matrix.centos }}
           path: "*.rpm"
           if-no-files-found: error
+
+  rhel-install:
+    name: CentOS ${{ matrix.centos }} install test
+    needs:
+      - rhel-binary
+    strategy:
+      fail-fast: false
+      matrix:
+        centos:
+          - 8
+    runs-on: ubuntu-latest
+    container: centos:${{ matrix.centos }}
+    steps:
+      - name: Download RPMs
+        uses: actions/download-artifact@v2
+        with:
+          name: rpm-centos-${{ matrix.centos }}
+
+      - name: Configure yum
+        run: yum -y -q install epel-release
+
+      - name: Install RPMs
+        run: yum -y localinstall *.rpm
 
   lint-rhel:
     name: Lint CentOS packages
