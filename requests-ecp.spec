@@ -1,6 +1,6 @@
 %define name requests-ecp
 %define version 0.2.2
-%define release 1
+%define release 2
 
 # -- metadata ---------------
 
@@ -24,11 +24,13 @@ BuildRequires: python-rpm-macros
 BuildRequires: /usr/bin/python3
 BuildRequires: python3-rpm-macros
 BuildRequires: python%{python3_pkgversion}-lxml
-BuildRequires: python%{python3_pkgversion}-pytest
 BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-requests-kerberos
-BuildRequires: python%{python3_pkgversion}-requests-mock
 BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 8
+BuildRequires: python%{python3_pkgversion}-pytest
+BuildRequires: python%{python3_pkgversion}-requests-mock
+%endif
 
 # -- packages ---------------
 
@@ -60,9 +62,11 @@ the Python %{python3_version} library.
 %py3_install
 
 %check
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 8
 export PYTHONPATH="%{buildroot}%{python3_sitelib}"
 export PATH="%{buildroot}%{_bindir}:${PATH}"
 %{__python3} -m pytest --verbose -ra --pyargs requests_ecp
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -77,6 +81,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Tue Mar 30 2021 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.2-2
+- don't run tests on el7
+
 * Fri Mar 19 2021 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.2-1
 - update for 0.2.2
 - tests are now bundled as part of the package

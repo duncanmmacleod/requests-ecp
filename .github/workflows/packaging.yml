@@ -222,16 +222,27 @@ jobs:
   # -- RHEL -----------------
 
   rhel-source:
-    name: CentOS ${{ matrix.centos }} source package
+    name: ${{ matrix.name }} ${{ matrix.version }} source package
     needs:
       - tarball
     strategy:
       fail-fast: false
       matrix:
-        centos:
-          - 8
+        include:
+          - dist: lscsoft
+            name: LSCSoft
+            version: EL7
+            container: igwn/base:el7-testing
+          - dist: centos
+            name: CentOS
+            version: 8
+            container: centos:8
+          - dist: fedora
+            name: Fedora
+            version: latest
+            container: fedora:latest
     runs-on: ubuntu-latest
-    container: centos:${{ matrix.centos }}
+    container: ${{ matrix.container }}
     env:
       TARBALL: "requests-ecp-*.tar.*"
     steps:
@@ -240,53 +251,95 @@ jobs:
         with:
           name: tarball
 
-      - name: Configure yum
+      - name: Configure DNF
+        if: matrix.dist == 'lscsoft'
+        run: ln -s /usr/bin/yum /usr/bin/dnf
+
+      - name: Configure EPEL
+        if: matrix.dist != 'fedora'
         run: |
-          yum -y -q install \
-              epel-release \
+          dnf -y install epel-release
+          dnf -y install epel-rpm-macros
+
+      - name: Configure rpmbuild
+        run: |
+          dnf -y install \
+              python-srpm-macros \
               rpm-build \
           ;
-          yum -y -q install epel-rpm-macros
 
       - name: Create source package
         run: rpmbuild -ts --define "_srcrpmdir $(pwd)" ${TARBALL}
 
       - uses: actions/upload-artifact@v2
         with:
-          name: srpm-centos-${{ matrix.centos }}
+          name: srpm-${{ matrix.dist }}-${{ matrix.version }}
           path: "*.src.rpm"
           if-no-files-found: error
 
   rhel-binary:
-    name: CentOS ${{ matrix.centos }} binary package
+    name: ${{ matrix.name }} ${{ matrix.version }} binary package
     needs:
       - rhel-source
     strategy:
       fail-fast: false
       matrix:
-        centos:
-          - 8
+        include:
+          - dist: lscsoft
+            name: LSCSoft
+            version: EL7
+            container: igwn/base:el7-testing
+          - dist: centos
+            name: CentOS
+            version: 8
+            container: centos:8
+          - dist: fedora
+            name: Fedora
+            version: latest
+            container: fedora:latest
     runs-on: ubuntu-latest
-    container: centos:${{ matrix.centos }}
+    container: ${{ matrix.container }}
     env:
       SRPM: "requests-ecp-*.src.rpm"
     steps:
       - name: Download SRPM
         uses: actions/download-artifact@v2
         with:
-          name: srpm-centos-${{ matrix.centos }}
+          name: srpm-${{ matrix.dist }}-${{ matrix.version }}
+
+      - name: Configure DNF
+        if: matrix.dist == 'lscsoft'
+        run: ln -s /usr/bin/yum /usr/bin/dnf
+
+      - name: Configure EPEL
+        if: matrix.dist != 'fedora'
+        run: |
+          dnf -y install epel-release
+          dnf -y install epel-rpm-macros
 
       - name: Install build tools
+        if: matrix.dist != 'lscsoft'
         run: |
-          yum -y -q install \
-              epel-release \
+          dnf -y -q install \
+              rpm-build \
+              "dnf-command(builddep)" \
+          ;
+
+      - name: Install build dependencies
+        if: matrix.dist != 'lscsoft'
+        run: dnf builddep -y ${SRPM}
+
+      - name: Install build tools (LSCSoft)
+        if: matrix.dist == 'lscsoft'
+        run: |
+          dnf -y -q install \
               rpm-build \
               yum-utils \
           ;
-          yum -y -q install epel-rpm-macros
 
-      - name: Install build dependencies
-        run: yum-builddep -y -q ${SRPM}
+      - name: Install build dependencies (LSCSoft)
+        if: matrix.dist == 'lscsoft'
+        run: yum-builddep -y ${SRPM}
 
       - name: Build binary packages
         run: |
@@ -310,35 +363,53 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: rpm-centos-${{ matrix.centos }}
+          name: rpm-${{ matrix.dist }}-${{ matrix.version }}
           path: "*.rpm"
           if-no-files-found: error
 
   rhel-install:
-    name: CentOS ${{ matrix.centos }} install test
+    name: ${{ matrix.name }} ${{ matrix.version }} install test
     needs:
       - rhel-binary
     strategy:
       fail-fast: false
       matrix:
-        centos:
-          - 8
+        include:
+          - dist: lscsoft
+            name: LSCSoft
+            version: EL7
+            container: igwn/base:el7-testing
+          - dist: centos
+            name: CentOS
+            version: 8
+            container: centos:8
+          - dist: fedora
+            name: Fedora
+            version: latest
+            container: fedora:latest
     runs-on: ubuntu-latest
-    container: centos:${{ matrix.centos }}
+    container: ${{ matrix.container }}
     steps:
       - name: Download RPMs
         uses: actions/download-artifact@v2
         with:
-          name: rpm-centos-${{ matrix.centos }}
+          name: rpm-${{ matrix.dist }}-${{ matrix.version }}
 
-      - name: Configure yum
-        run: yum -y -q install epel-release
+      - name: Configure DNF
+        if: matrix.dist == 'lscsoft'
+        run: ln -s /usr/bin/yum /usr/bin/dnf
+
+      - name: Configure EPEL
+        if: matrix.dist != 'fedora'
+        run: |
+          dnf -y install epel-release
+          dnf -y install epel-rpm-macros
 
       - name: Install RPMs
-        run: yum -y localinstall *.rpm
+        run: dnf -y install *.rpm
 
   lint-rhel:
-    name: Lint CentOS packages
+    name: Lint RPMs
     runs-on: ubuntu-latest
     container: centos:8
     needs:
@@ -351,7 +422,7 @@ jobs:
 
       - name: Install rpmlint
         run: |
-          yum -y -q install \
+          dnf -y -q install \
               rpmlint \
           ;
 
