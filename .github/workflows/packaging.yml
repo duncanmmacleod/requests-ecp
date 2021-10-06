@@ -58,9 +58,9 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - stretch-backports
-          - buster
-          - bullseye
+          - oldstable
+          - stable
+          - testing
     runs-on: ubuntu-latest
     container: debian:${{ matrix.debian }}
     env:
@@ -106,9 +106,9 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - stretch-backports
-          - buster
-          - bullseye
+          - oldstable
+          - stable
+          - testing
     runs-on: ubuntu-latest
     container: debian:${{ matrix.debian }}
     env:
@@ -174,9 +174,9 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - stretch-backports
-          - buster
-          - bullseye
+          - oldstable
+          - stable
+          - testing
     runs-on: ubuntu-latest
     container: debian:${{ matrix.debian }}
     steps:
@@ -191,9 +191,8 @@ jobs:
       - name: Install packages
         shell: bash -ex {0}
         run: |
-          if [[ "${{ matrix.debian }}" == *backports ]]; then BACKPORTS="-t ${{ matrix.debian }}"; fi
           dpkg --install *.deb || { \
-              apt-get -y -f ${BACKPORTS} install;
+              apt-get -y -f install;
               dpkg --install *.deb;
           }
 
@@ -207,7 +206,7 @@ jobs:
       - name: Download debian package
         uses: actions/download-artifact@v2
         with:
-          name: deb-buster
+          name: deb-stable
 
       - name: Install lintian
         run: |
@@ -217,7 +216,7 @@ jobs:
           ;
 
       - name: Lintian
-        run: lintian --color=auto --fail-on-warnings --allow-root --pedantic *.changes
+        run: lintian --color=auto --fail-on warning --allow-root --pedantic *.changes
 
   # -- RHEL -----------------
 
