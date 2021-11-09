@@ -25,7 +25,7 @@ BuildRequires: /usr/bin/python3
 BuildRequires: python3-rpm-macros
 BuildRequires: python%{python3_pkgversion}-lxml
 BuildRequires: python%{python3_pkgversion}-requests
-BuildRequires: python%{python3_pkgversion}-requests-kerberos
+BuildRequires: python%{python3_pkgversion}-requests-gssapi >= 1.2.2
 BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
 %if 0%{?rhel} == 0 || 0%{?rhel} >= 8
 BuildRequires: python%{python3_pkgversion}-pytest
@@ -43,7 +43,7 @@ for the Requests Python library.
 Summary: %{summary}
 Requires: python%{python3_pkgversion}-lxml
 Requires: python%{python3_pkgversion}-requests
-Requires: python%{python3_pkgversion}-requests-kerberos
+Requires: python%{python3_pkgversion}-requests-gssapi >= 1.2.2
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
 %description -n python%{python3_pkgversion}-%{name}
 requests-ecp adds optional SAML/ECP authentication support

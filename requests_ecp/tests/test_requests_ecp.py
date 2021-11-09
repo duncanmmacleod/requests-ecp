@@ -26,9 +26,8 @@ import pytest
 import requests
 from requests.auth import HTTPBasicAuth
 
-from requests_kerberos import HTTPKerberosAuth
-
 import requests_ecp
+from requests_ecp import HTTPKerberosAuth
 
 
 class TestHTTPECPAuth(object):
@@ -62,10 +61,6 @@ class TestHTTPECPAuth(object):
         assert auth.username == "me"
         assert auth.password == "mypasswd"
 
-    @pytest.mark.skipif(
-        requests_ecp.REQUESTS_KERBEROS_VERSION < "0.9.0",
-        reason="requests-kerberos-0.9.0 or later required",
-        )
     def test_init_auth_kerberos(self):
         auth = self.TEST_CLASS._init_auth(
             "https://idp.test.com",
@@ -74,10 +69,6 @@ class TestHTTPECPAuth(object):
         assert isinstance(auth, HTTPKerberosAuth)
         assert auth.hostname_override == "idp.test.com"
 
-    @pytest.mark.skipif(
-        requests_ecp.REQUESTS_KERBEROS_VERSION < "0.9.0",
-        reason="requests-kerberos-0.9.0 or later required",
-    )
     def test_init_auth_kerberos_url(self):
         auth = self.TEST_CLASS._init_auth(
             "https://idp.test.com",
