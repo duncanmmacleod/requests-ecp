@@ -1,0 +1,13 @@
+diff --git a/setup.cfg b/setup.cfg
+index cccb8d6..1a1c80b 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -36,7 +36,7 @@ setup_requires =
+ install_requires = 
+ 	lxml
+ 	requests
+-	requests-gssapi >= 1.2.2
++	requests-kerberos >= 0.9.0
+ 
+ [options.extras_require]
+ tests = 

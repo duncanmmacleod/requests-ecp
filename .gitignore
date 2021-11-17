@@ -21,6 +21,10 @@ var/
 .installed.cfg
 *.egg
 MANIFEST
+debian/python3-requests-ecp/
+debian/*debhelper*
+debian/*substvars
+.pybuild/
 
 # Testing / coverage
 .pytest_cache/

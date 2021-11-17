@@ -22,7 +22,6 @@
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 __version__ = "0.2.2"
 
-from distutils.version import LooseVersion
 from getpass import getpass
 from urllib import parse as urllib_parse
 from urllib.error import URLError
@@ -34,10 +33,11 @@ from requests import (
 )
 from requests.cookies import extract_cookies_to_jar
 
-from requests_kerberos import (
-    __version__ as REQUESTS_KERBEROS_VERSION,
-    HTTPKerberosAuth,
-)
+try:
+    from requests_gssapi import HTTPKerberosAuth
+except ModuleNotFoundError:  # pragma: no cover
+    # debian doesn't have requests-gssapi
+    from requests_kerberos import HTTPKerberosAuth
 
 from lxml import etree
 
@@ -46,8 +46,6 @@ __all__ = [
     "ECPAuthSessionMixin",
     "Session",
 ]
-
-REQUESTS_KERBEROS_VERSION = LooseVersion(REQUESTS_KERBEROS_VERSION)
 
 
 def _get_xml_attribute(xdata, path):
