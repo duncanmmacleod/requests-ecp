@@ -1,3 +1,11 @@
+requests-ecp (0.2.3-1) unstable; urgency=low
+
+  * move to python3-gssapi as kerberos backend in main package,
+    debian config now includes a patch to undo that change because
+    that package isn't available, but python3-kerberos still works
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Mon, 22 Nov 2021 10:00:00 +0000
+
 requests-ecp (0.2.2-1) unstable; urgency=low
 
   * update for 0.2.2
