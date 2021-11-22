@@ -20,7 +20,7 @@
 """
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 from getpass import getpass
 from urllib import parse as urllib_parse
