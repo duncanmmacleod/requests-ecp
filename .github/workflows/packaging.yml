@@ -236,6 +236,10 @@ jobs:
             name: CentOS
             version: 8
             container: centos:8
+          - dist: centos
+            name: CentOS
+            version: stream9
+            container: quay.io/centos/centos:stream9
           - dist: fedora
             name: Fedora
             version: latest
@@ -257,6 +261,11 @@ jobs:
       - name: Configure EPEL
         if: matrix.dist != 'fedora'
         run: |
+          if $(grep -q "Stream 9" /etc/os-release); then
+              dnf -y install dnf-plugins-core
+              dnf config-manager --set-enabled crb
+              dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+          fi
           dnf -y install epel-release
           dnf -y install epel-rpm-macros
 
@@ -292,6 +301,10 @@ jobs:
             name: CentOS
             version: 8
             container: centos:8
+          - dist: centos
+            name: CentOS
+            version: stream9
+            container: quay.io/centos/centos:stream9
           - dist: fedora
             name: Fedora
             version: latest
@@ -313,6 +326,11 @@ jobs:
       - name: Configure EPEL
         if: matrix.dist != 'fedora'
         run: |
+          if $(grep -q "Stream 9" /etc/os-release); then
+              dnf -y install dnf-plugins-core
+              dnf config-manager --set-enabled crb
+              dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+          fi
           dnf -y install epel-release
           dnf -y install epel-rpm-macros
 
@@ -382,6 +400,10 @@ jobs:
             name: CentOS
             version: 8
             container: centos:8
+          - dist: centos
+            name: CentOS
+            version: stream9
+            container: quay.io/centos/centos:stream9
           - dist: fedora
             name: Fedora
             version: latest
@@ -401,8 +423,12 @@ jobs:
       - name: Configure EPEL
         if: matrix.dist != 'fedora'
         run: |
+          if $(grep -q "Stream 9" /etc/os-release); then
+              dnf -y install dnf-plugins-core
+              dnf config-manager --set-enabled crb
+              dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+          fi
           dnf -y install epel-release
-          dnf -y install epel-rpm-macros
 
       - name: Install RPMs
         run: dnf -y install *.rpm
