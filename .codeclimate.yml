@@ -13,7 +13,7 @@ plugins:
     enabled: true
     config:
       python_version: 3
-    configfile: .bandit.yml
+    configfile: bandit.yml
   duplication:
     enabled: true
     config:
