@@ -11,6 +11,8 @@ checks:
 plugins:
   bandit:
     enabled: true
+    config:
+      python_version: 3
   duplication:
     enabled: true
     config:
