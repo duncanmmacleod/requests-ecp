@@ -1,0 +1,39 @@
+version: "2"
+
+checks:
+  argument-count:
+    config:
+      threshold: 8
+  file-lines:
+    config:
+      threshold: 1000
+
+plugins:
+  bandit:
+    enabled: true
+    config:
+      python_version: 3
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  fixme:
+    enabled: true
+    config:
+      strings:
+      - FIXME
+      - XXX
+  pep8:
+    enabled: true
+  radon:
+    enabled: true
+    config:
+      threshold: "C"
+
+ratings:
+  paths:
+  - "**.py"
+
+exclude_paths:
+- "docs/*"

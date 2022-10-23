@@ -1,0 +1,5 @@
+# Bandit configuration file
+# Used by codeclimate
+
+exclude_dirs:
+  - 'requests_ecp/tests/'
