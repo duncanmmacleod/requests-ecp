@@ -232,10 +232,10 @@ jobs:
             name: LSCSoft
             version: EL7
             container: igwn/base:el7-testing
-          - dist: centos
-            name: CentOS
+          - dist: rockylinux
+            name: Rocky Linux
             version: 8
-            container: centos:8
+            container: rockylinux:8
           - dist: fedora
             name: Fedora
             version: latest
@@ -288,10 +288,10 @@ jobs:
             name: LSCSoft
             version: EL7
             container: igwn/base:el7-testing
-          - dist: centos
-            name: CentOS
+          - dist: rockylinux
+            name: Rocky Linux
             version: 8
-            container: centos:8
+            container: rockylinux:8
           - dist: fedora
             name: Fedora
             version: latest
@@ -378,10 +378,10 @@ jobs:
             name: LSCSoft
             version: EL7
             container: igwn/base:el7-testing
-          - dist: centos
-            name: CentOS
+          - dist: rockylinux
+            name: Rocky Linux
             version: 8
-            container: centos:8
+            container: rockylinux:8
           - dist: fedora
             name: Fedora
             version: latest
@@ -410,14 +410,14 @@ jobs:
   lint-rhel:
     name: Lint RPMs
     runs-on: ubuntu-latest
-    container: centos:8
+    container: rockylinux:8
     needs:
       - rhel-binary
     steps:
       - name: Download RPM
         uses: actions/download-artifact@v2
         with:
-          name: rpm-centos-8
+          name: rpm-rockylinux-8
 
       - name: Install rpmlint
         run: |
