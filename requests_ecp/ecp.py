@@ -24,10 +24,13 @@ __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 from lxml import etree
 
 from requests import (
-    Request,
     HTTPError,
+    Request,
+    Session,
 )
 
+
+# -- utilities --------------
 
 def _get_xml_attribute(xdata, path):
     """Parse an attribute from an XML document
@@ -38,6 +41,45 @@ def _get_xml_attribute(xdata, path):
         'paos': 'urn:liberty:paos:2003-08'
     }
     return xdata.xpath(path, namespaces=namespaces)[0]
+
+
+def _send(
+    connection,
+    method,
+    url,
+    **kwargs,
+):
+    """Format and send a request.
+    """
+    request_kw = {k: kwargs.pop(k) for k in (
+        "auth",
+        "cookies",
+        "data",
+        "files",
+        "headers",
+        "json",
+    ) if k in kwargs}
+
+    # if given a Session use it
+    if isinstance(connection, Session):
+        response = connection.request(
+            method.lower(),
+            url,
+            allow_redirects=False,
+            **request_kw,
+        )
+
+    # otherwise manually prepare the request
+    else:
+        request = Request(
+            method=method,
+            url=url,
+            **request_kw,
+        ).prepare()
+        response = connection.send(request, **kwargs)
+
+    response.raise_for_status()
+    return response
 
 
 def _report_soap_fault(
@@ -51,10 +93,10 @@ def _report_soap_fault(
 ):
     """Report a problem with the SOAP configuration of SP/IdP pair.
     """
-    request = Request(
-        method="POST",
-        url=url,
-        headers={'Content-Type': 'application/vnd.paos+xml'},
+    return _send(
+        connection,
+        "POST",
+        url,
         data=f"""
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
@@ -64,39 +106,73 @@ def _report_soap_fault(
     </S:Fault>
   </S:Body>
 </S:Envelope>""".strip(), # noqa
-    ).prepare()
-    return connection.send(request, **kwargs)
+        headers={'Content-Type': 'application/vnd.paos+xml'},
+    )
 
+
+# -- ECP worker -------------
 
 def authenticate(
     connection,
     auth,
     endpoint,
-    url=None,
-    cookies=None,
+    url,
     **kwargs,
 ):
     """Perform an ECP authorisation round-trip.
-    """
-    target = url or endpoint
 
+    A good description of this is round-trip is here:
+
+    https://medium.com/@winma.15/soap-vs-paos-bindings-in-saml-9ce12a052a0f
+
+    This function isn't really meant to be called outside of
+    the `HTTPECPAuth` response handler, and is not well tested in any
+    other usage.
+
+    Parameters
+    ----------
+    connection : `requests.Session`, `requests.adapters.HTTPAdapter`
+        The thing to use to send the request, must support a `send` method.
+
+    auth : `requests.auth.AuthBase`
+        The authentication object to use when communicating with the
+        ECP Identity Provider.
+
+    endpoint : `str`
+        The URL of the Identity Provider ECP endpoint.
+
+    url : `str`
+        The URL of the resource on the Service Provider to request.
+
+    kwargs
+        Other keyword arguments are passed directly to
+        :meth:`requests.Session.request` or `http.client.HTTPConnection`.
+
+    Returns
+    -------
+    responses : `tuple` of `requests.Response`
+        A `tuple` of three (3) `requests.Response` objects are returned
+        in the order in which they were requested. The final response
+        _should_ include a ``302 Found`` redirect back to the original
+        requested resource.
+    """
     # -- step 1: initiate ECP request -----------
 
-    req1 = Request(
+    # request resource via ECP
+    resp1 = _send(
+        connection,
         method="GET",
-        url=target,
-        cookies=cookies,
+        url=url,
         headers={
             'Accept': 'text/html; application/vnd.paos+xml',
             'PAOS': 'ver="urn:liberty:paos:2003-08";'
                     '"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp"',
         },
-    ).prepare()
+        **kwargs,
+    )
 
-    # request target from SP
-    resp1 = connection.send(req1, **kwargs)
-
-    # convert the SP resonse from string to etree Element object
+    # the response from the SP _should be_ an `<AuthnRequest>` message
+    # to be relayed to the IdP.
     try:
         spetree = etree.XML(resp1.content)
     finally:
@@ -108,28 +184,30 @@ def authenticate(
         spetree,
         "//ecp:RelayState",
     )
+
+    # pick out the responseConsumerURL to validate against the
+    # AssertionConsumerServiceURL we receive later from the IdP
     rcurl = _get_xml_attribute(
         spetree,
         "/S:Envelope/S:Header/paos:Request/@responseConsumerURL",
     )
 
-    # remote the SOAP header to create a packge for the IdP
+    # -- step 2: authenticate with endpoint -----
+
+    # remove the PAOS header to create a SOAP package for the IdP
     idpbody = spetree
     idpbody.remove(idpbody[0])
 
-    # -- step 2: authenticate with endpoint -----
-
-    req2 = Request(
+    # forward <AuthnRequest> to Identity Provider using SOAP
+    resp2 = _send(
+        connection,
         method="POST",
         url=endpoint,
         auth=auth,
-        cookies=cookies,
         data=etree.tostring(idpbody),
         headers={"Content-Type": "text/xml; charset=utf-8"},
-    ).prepare()
-    resp2 = connection.send(req2, **kwargs)
-
-    # -- step 3: post back to the SP ------------
+        **kwargs,
+    )
 
     try:
         idptree = etree.XML(resp2.content)
@@ -154,21 +232,25 @@ def authenticate(
         except HTTPError:
             pass  # don't care, just doing a service
 
-    # make a deep copy of the IdP response and replace its
-    # header contents with the relay state initially sent by
-    # the SP
+    # -- step 3: post back to the SP ------------
+
+    # replace the IdP's <Response> with the `<RelayState>` we
+    # received originally...
     actree = idptree
     actree[0][0] = relaystate
 
-    # POST the package to the SP
-    req3 = Request(
+    # and post back to the SP's ECP endpoint
+    resp3 = _send(
+        connection,
         method="POST",
         url=acsurl,
-        cookies=cookies,
         data=etree.tostring(actree),
         headers={'Content-Type': 'application/vnd.paos+xml'},
-    ).prepare()
-    resp3 = connection.send(req3)
+        **kwargs,
+    )
 
-    # return all responses
+    # The result of this _should be_ a final redirect back to the
+    # resource we requested originally.
+
+    # return the response history:
     return resp1, resp2, resp3

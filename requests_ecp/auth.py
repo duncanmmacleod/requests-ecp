@@ -29,7 +29,6 @@ from urllib.parse import (
 )
 
 from requests import auth as requests_auth
-from requests.cookies import extract_cookies_to_jar
 
 try:
     from requests_gssapi import HTTPKerberosAuth
@@ -168,22 +167,38 @@ class HTTPECPAuth(requests_auth.AuthBase):
 
     # -- auth method --------
 
-    def authenticate(self, session, endpoint=None, url=None, **kwargs):
+    def _authenticate_session(
+        self,
+        session,
+        endpoint=None,
+        url=None,
+        **kwargs,
+    ):
+        """Execute ECP authenticate for a `requests.Session`.
+        """
         url = url or endpoint or self.idp
-        adapter = session.get_adapter(url=url)
-        # authenticate and store cookies
-        for resp in self._authenticate(adapter, url=url):
-            extract_cookies_to_jar(session.cookies, resp.request, resp.raw)
+        self._authenticate(session, url=url)
 
     def _authenticate_response(self, response, endpoint=None, **kwargs):
+        """Execute ECP authenticate based on a `requests.Response`.
+
+        Returns
+        -------
+        response : `requests.Response`
+            The final response from the service provider that should be
+            a `302 Found` redirect back to the original resource URL.
+        """
         response.raw.read()
         response.raw.release_conn()
-        return self._authenticate(
+        new = self._authenticate(
             response.connection,
             endpoint=endpoint,
             url=response.url,
-            **kwargs
+            **kwargs,
         )
+        r = new[-1]
+        r.history.extend([response] + new[:-1])
+        return r
 
     def _authenticate(
             self,
@@ -238,13 +253,8 @@ class HTTPECPAuth(requests_auth.AuthBase):
         # is asking for ECP authentication, then handle that here:
         # (but only do that once)
         elif is_ecp_auth_redirect(response):
-            # authenticate (preserving the history)
-            response.history.extend(
-                self._authenticate_response(response, **kwargs),
-            )
-
-            # and hijack the redirect back to itself
-            response.headers['location'] = response.url
+            # authenticate and return the final redirect
+            response = self._authenticate_response(response, **kwargs)
             self._num_ecp_auth += 1
 
         return response
