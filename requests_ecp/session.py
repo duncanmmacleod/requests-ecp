@@ -37,7 +37,7 @@ class ECPAuthSessionMixin:
             kerberos=False,
             username=None,
             password=None,
-            **kwargs
+            **kwargs,
     ):
         super().__init__(**kwargs)
         self.auth = HTTPECPAuth(
@@ -51,13 +51,35 @@ class ECPAuthSessionMixin:
 class Session(ECPAuthSessionMixin, _Session):
     """A `requests.Session` with default ECP authentication
     """
-    def ecp_authenticate(self, endpoint=None, url=None, **kwargs):
-        """Manually authenticate against the endpoint
+    def ecp_authenticate(self, url, endpoint=None, **kwargs):
+        """Manually authenticate against the endpoint.
 
         This generates a shibboleth session cookie for the domain
         of the given URL, which defaults to the endpoint itself.
+
+        Parameters
+        ----------
+        url : `str`
+            The URL of the resource (on the Service Provider) to request.
+
+        endpoint : `str`
+            The URL of the ECP endpoint on the Identity Provider.
+            If not given it will be taken from the ``auth`` attribute.
+
+        kwargs
+            Other keyword arguments are passed directly to
+            :func:`requests_ecp.ecp.authenticate`.
+
+        See also
+        --------
+        requests_ecp.ecp.authenticate
+            For details of the ECP authentication workflow.
         """
-        return self.auth.authenticate(
+        if not isinstance(self.auth, HTTPECPAuth):
+            raise ValueError(
+                f"Cannot execute ECP authentication with {type(self.auth)}",
+            )
+        return self.auth._authenticate_session(
             self,
             endpoint=endpoint,
             url=url,
