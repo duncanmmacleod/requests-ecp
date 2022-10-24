@@ -22,7 +22,11 @@
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
 from getpass import getpass
-from urllib import parse as urllib_parse
+from urllib.parse import (
+    parse_qs,
+    urlparse,
+    urlunsplit,
+)
 
 from requests import auth as requests_auth
 from requests.cookies import extract_cookies_to_jar
@@ -35,6 +39,10 @@ except ModuleNotFoundError:  # pragma: no cover
 
 from .ecp import authenticate as ecp_authenticate
 
+GITLAB_AUTH_SHIB_CALLBACK_PATH = "/users/auth/shibboleth/callback"
+
+
+# -- Auth utilities ---------
 
 def _prompt_username_password(host, username=None):
     """Prompt for a username and password from the console
@@ -46,6 +54,77 @@ def _prompt_username_password(host, username=None):
     )
     return username, password
 
+
+# -- Response interception --
+
+def is_ecp_auth_redirect(response):
+    """Return `True` if a response indicates a request for ECP authentication.
+
+    Parameters
+    ----------
+    response : `requests.Response`
+        The response object to inspect.
+
+    Returns
+    -------
+    state : bool
+        `True` if ``response`` looks like a redirect initiated by Shibboleth,
+        otherwise `False`.
+    """
+    if not response.is_redirect:
+        return False
+
+    # strip out the redirect location and parse it
+    target = response.headers['location']
+    query = parse_qs(urlparse(target).query)
+
+    return (
+        # Identity Provider
+        "SAMLRequest" in query
+        # Shibboleth discovery service
+        or "Shibboleth.sso" in target
+    )
+
+
+def is_gitlab_auth_redirect(response):
+    """Return `True` if a response indicates a gitlab auth redirect.
+
+    Parameters
+    ----------
+    response : `requests.Response`
+        The response object to inspect.
+
+    Returns
+    -------
+    state : bool
+        `True` if ``response`` looks like a redirect initiated by GitLab,
+        otherwise `False`.
+    """
+    if not response.is_redirect:
+        return False
+
+    # if the redirect cam from the callback, then the callback doesn't work
+    # so let's not get stuck in an infinite loop
+    if urlparse(response.url).path == GITLAB_AUTH_SHIB_CALLBACK_PATH:
+        return False
+
+    # parse the redirect target to get the gitlab host name
+    uparts = urlparse(response.headers['location'])
+
+    # if not redirecting to login, this isn't meant for us
+    if not uparts.path == "/users/sign_in":
+        return False
+
+    # only redirect if there is a _gitlab_session cookie to use later
+    for cookie in response.cookies:
+        if (
+            cookie.name == "_gitlab_session"
+            and cookie.domain == uparts.hostname
+        ):
+            return True
+
+
+# -- Auth -------------------
 
 class HTTPECPAuth(requests_auth.AuthBase):
     def __init__(
@@ -72,7 +151,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
     def _init_auth(idp, kerberos=False, username=None, password=None):
         if kerberos:
             url = kerberos if isinstance(kerberos, str) else idp
-            loginhost = urllib_parse.urlparse(url).netloc.split(':')[0]
+            loginhost = urlparse(url).netloc.split(':')[0]
             return HTTPKerberosAuth(
                 force_preemptive=True,
                 hostname_override=loginhost,
@@ -80,9 +159,12 @@ class HTTPECPAuth(requests_auth.AuthBase):
         elif username and password:
             return requests_auth.HTTPBasicAuth(username, password)
         return requests_auth.HTTPBasicAuth(*_prompt_username_password(
-            urllib_parse.urlparse(idp).hostname,
+            urlparse(idp).hostname,
             username,
         ))
+
+    def reset(self):
+        self._num_ecp_auth = 0
 
     # -- auth method --------
 
@@ -129,35 +211,33 @@ class HTTPECPAuth(requests_auth.AuthBase):
             **kwargs,
         )
 
-    # -- auth discovery -----
-
-    @staticmethod
-    def is_ecp_auth_redirect(response):
-        """Return `True` if a response indicates a request for authentication
-        """
-        if not response.is_redirect:
-            return False
-
-        # strip out the redirect location and parse it
-        target = response.headers['location']
-        if isinstance(target, bytes):
-            target = target.decode("utf-8")
-        query = urllib_parse.parse_qs(urllib_parse.urlparse(target).query)
-
-        return (
-                "SAMLRequest" in query or  # redirected to IdP
-                "Shibboleth.sso" in target  # Shibboleth discovery service
-        )
-
     # -- event handling -----
 
     def handle_response(self, response, **kwargs):
         """Handle ECP authentication based on a transation response
         """
+        # if we've already tried, don't try again,
+        # otherwise we end up in an infinite loop
+        if self._num_ecp_auth:
+            return response
+
+        # if the redirect looks like gitlab trying to go through ECP auth,
+        # redirect to the shibboleth callback for gitlab
+        if is_gitlab_auth_redirect(response):
+            # redirect the redirect to the shibboleth callback URL
+            parts = urlparse(response.headers['location'])
+            response.headers['location'] = urlunsplit((
+                parts.scheme,
+                parts.netloc,
+                GITLAB_AUTH_SHIB_CALLBACK_PATH,
+                parts.query,
+                parts.fragment,
+            ))
+
         # if the request was redirected in a way that looks like the SP
         # is asking for ECP authentication, then handle that here:
         # (but only do that once)
-        if self.is_ecp_auth_redirect(response) and not self._num_ecp_auth:
+        elif is_ecp_auth_redirect(response):
             # authenticate (preserving the history)
             response.history.extend(
                 self._authenticate_response(response, **kwargs),
@@ -166,8 +246,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
             # and hijack the redirect back to itself
             response.headers['location'] = response.url
             self._num_ecp_auth += 1
-        else:
-            self._num_ecp_auth = 0
 
         return response
 
@@ -175,9 +253,11 @@ class HTTPECPAuth(requests_auth.AuthBase):
         """Deregister the response handler
         """
         response.request.deregister_hook('response', self.handle_response)
+        self.reset()
 
     def __call__(self, request):
         """Register the response handler
         """
+        self.reset()
         request.register_hook('response', self.handle_response)
         return request
