@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) Cardiff University (2019-2020)
+# Copyright (C) Cardiff University (2020-2022)
 #
 # This file is part of requests_ecp
 #
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with requests_ecp.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Tests for requests_ecp
+"""Tests for requests_ecp.auth.
 """
 
 from unittest import mock
@@ -27,21 +27,21 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 import requests_ecp
-from requests_ecp import HTTPKerberosAuth
+from requests_ecp import auth as requests_ecp_auth
 
 
 class TestHTTPECPAuth(object):
     TEST_CLASS = requests_ecp.HTTPECPAuth
 
-    @mock.patch("requests_ecp.input", return_value="user")
-    @mock.patch("requests_ecp.getpass", return_value="passwd")
+    @mock.patch("requests_ecp.auth.input", return_value="user")
+    @mock.patch("requests_ecp.auth.getpass", return_value="passwd")
     def test_init_auth(self, input_, getpass_):
         auth = self.TEST_CLASS._init_auth("https://idp.test.com")
         assert isinstance(auth, HTTPBasicAuth)
         assert auth.username == "user"
         assert auth.password == "passwd"
 
-    @mock.patch("requests_ecp.getpass", return_value="passwd")
+    @mock.patch("requests_ecp.auth.getpass", return_value="passwd")
     def test_init_auth_username(self, getpass_):
         auth = self.TEST_CLASS._init_auth(
             "https://idp.test.com",
@@ -66,7 +66,7 @@ class TestHTTPECPAuth(object):
             "https://idp.test.com",
             kerberos=True,
         )
-        assert isinstance(auth, HTTPKerberosAuth)
+        assert isinstance(auth, requests_ecp_auth.HTTPKerberosAuth)
         assert auth.hostname_override == "idp.test.com"
 
     def test_init_auth_kerberos_url(self):
@@ -74,7 +74,7 @@ class TestHTTPECPAuth(object):
             "https://idp.test.com",
             kerberos="https://kerberos.test.com/idp/",
         )
-        assert isinstance(auth, HTTPKerberosAuth)
+        assert isinstance(auth, requests_ecp_auth.HTTPKerberosAuth)
         assert auth.hostname_override == "kerberos.test.com"
 
     @pytest.mark.parametrize("location", [
@@ -117,7 +117,7 @@ class TestHTTPECPAuth(object):
         assert not self.TEST_CLASS.is_ecp_auth_redirect(resp)
 
     @mock.patch(
-        "requests_ecp.HTTPECPAuth.is_ecp_auth_redirect",
+        "requests_ecp.auth.HTTPECPAuth.is_ecp_auth_redirect",
         return_value=False,
     )
     def test_handle_response_noauth(self, _, requests_mock):
@@ -132,11 +132,11 @@ class TestHTTPECPAuth(object):
         assert session.auth._num_ecp_auth == 0
 
     @mock.patch(
-        "requests_ecp.HTTPECPAuth.is_ecp_auth_redirect",
+        "requests_ecp.auth.HTTPECPAuth.is_ecp_auth_redirect",
         return_value=True,
     )
     @mock.patch(
-        "requests_ecp.HTTPECPAuth._authenticate",
+        "requests_ecp.auth.HTTPECPAuth._authenticate",
     )
     def test_handle_response_auth(self, mock_authenticate, _, requests_mock):
         requests_mock.get("https://test")
