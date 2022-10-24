@@ -65,6 +65,7 @@ def _send(
         response = connection.request(
             method.lower(),
             url,
+            allow_redirects=False,
             **request_kw,
         )
 
