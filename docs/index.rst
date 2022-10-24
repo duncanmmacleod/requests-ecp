@@ -3,7 +3,8 @@
 ##############
 
 `requests-ecp` provides a SAML/ECP authentication handler for
-`Requests <http://requests.readthedocs.io/>`__.
+`Requests <http://requests.readthedocs.io/>`__ that implements the
+`SAML 2.0 ECP Profile <https://docs.oasis-open.org/security/saml/Post2.0/saml-ecp/v2.0/cs01/saml-ecp-v2.0-cs01.html>`__.
 
 ============
 Installation
@@ -17,7 +18,16 @@ Installation
 
           $ conda install -c conda-forge requests-ecp
 
-      Supported python versions: 3.6+.
+   .. tab:: Debian Linux
+
+      .. code-block:: bash
+
+          $ apt-get install python3-requests-ecp
+
+      See the IGWN Computing Guide software repositories entry for
+      `Debian <https://computing.docs.ligo.org/guide/software/debian/>`__
+      for instructions on how to configure the required
+      IGWN Debian repositories.
 
    .. tab:: Pip
 
@@ -25,13 +35,24 @@ Installation
 
           $ python -m pip install requests-ecp
 
-      Supported python versions: 3.5+.
+   .. tab:: Scientific Linux
 
-==================
-User documentation
-==================
+      .. code-block:: bash
+
+          $ yum install python3-requests-ecp
+
+      See the IGWN Computing Guide software repositories entries for
+      `Scientific Linux 7
+      <https://computing.docs.ligo.org/guide/software/sl7/>`__
+      or
+      `Rocky Linux 8 <https://computing.docs.ligo.org/guide/software/rl8/>`__
+      for instructions on how to configure the required IGWN Yum repositories.
+
+==============================
+``requests-ecp`` documentation
+==============================
 
 .. automodapi:: requests_ecp
    :no-inheritance-diagram:
-   :no-main-docstr:
+   :no-heading:
    :headings: =-

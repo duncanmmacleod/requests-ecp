@@ -126,6 +126,24 @@ def is_gitlab_auth_redirect(response):
 # -- Auth -------------------
 
 class HTTPECPAuth(requests_auth.AuthBase):
+    """SAML2/ECP authorisation plugin for :mod:`requests`.
+
+    This auth plugin intercepts ``302 Found`` redirect responses
+    that target a `SAMLRequest` authorisation or a `Shibboleth.sso`
+    discovery service, and executes a SAML2/ECP workflow against
+    the configured Identity Provider (``idp``).
+
+    Kerberos authentication is supported via the
+    `requests GSSAPI <https://github.com/pythongssapi/requests-gssapi>`__
+    module.
+
+    >>> from requests import Session
+    >>> from requests_ecp import HTTPECPAuth
+    >>> with Session() as sess:
+    ...     sess.auth = HTTPECPAuth(idp="https://idp.example.com/SAML2/SOAP/ECP")
+    ...     sess.get("https://private.example.com/data")
+
+    """   # noqa: E501
     def __init__(
             self,
             idp,

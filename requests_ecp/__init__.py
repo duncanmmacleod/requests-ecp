@@ -17,6 +17,15 @@
 # along with requests_ecp.  If not, see <http://www.gnu.org/licenses/>.
 
 """ECP authentication wrappers for python-requests.
+
+Basic usage:
+
+.. code-block:: python
+
+    >>> from request_ecp import Session
+    >>> with Session(idp="https://idp.example.com/SAML/SOAP/ECP") as sess:
+    ...     sess.get("https://private.example.com/data")
+
 """
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
