@@ -30,6 +30,52 @@ import requests_ecp
 from requests_ecp import auth as requests_ecp_auth
 
 
+@pytest.mark.parametrize("location", [
+    # IdP
+    "https://idp.test.com/?SAMLRequest=12345",
+    # Discovery service
+    "https://example.com/Shibboleth.sso",
+])
+def test_is_ecp_auth_redirect(requests_mock, location):
+    # configure mock
+    requests_mock.get(
+        "https://example.com/mydata",
+        status_code=302,
+        headers={"Location": location},
+    )
+    requests_mock.get(location)
+
+    # execute mock request
+    resp = requests.get("https://example.com/mydata", allow_redirects=False)
+
+    # test is_ecp_auth_redirect
+    assert requests_ecp_auth.is_ecp_auth_redirect(resp)
+
+
+@pytest.mark.parametrize("response_kwargs", [
+    # not a redirect
+    {"status_code": 200},
+    # redirect but without location (somehow)
+    {"status_code": 302},
+    # redirect with location, but not an ECP redirect
+    {"status_code": 302, "headers": {"Location": "https://example.com/login"}},
+])
+def test_is_ecp_auth_redirect_false(requests_mock, response_kwargs):
+    # configure mock
+    requests_mock.get(
+        "https://example.com/mydata",
+        **response_kwargs
+    )
+    if "Location" in response_kwargs.get("headers", {}):
+        requests_mock.get(response_kwargs["headers"]["Location"])
+
+    # execute mock request
+    resp = requests.get("https://example.com/mydata", allow_redirects=False)
+
+    # test is_ecp_auth_redirect
+    assert not requests_ecp_auth.is_ecp_auth_redirect(resp)
+
+
 class TestHTTPECPAuth(object):
     TEST_CLASS = requests_ecp.HTTPECPAuth
 
@@ -77,47 +123,8 @@ class TestHTTPECPAuth(object):
         assert isinstance(auth, requests_ecp_auth.HTTPKerberosAuth)
         assert auth.hostname_override == "kerberos.test.com"
 
-    @pytest.mark.parametrize("location", [
-        "https://idp.test.com/?SAMLRequest=12345",
-        "https://idp.test.com/Shibboleth.sso",
-    ])
-    def test_is_ecp_auth_redirect(self, requests_mock, location):
-        # configure mock
-        requests_mock.get(
-            "https://test.domain.com",
-            status_code=302,
-            headers={"Location": location},
-        )
-        requests_mock.get(location)
-
-        # execute mock request
-        resp = requests.get("https://test.domain.com", allow_redirects=False)
-
-        # test is_ecp_auth_redirect
-        assert self.TEST_CLASS.is_ecp_auth_redirect(resp)
-
-    @pytest.mark.parametrize("response_kwargs", [
-        {"status_code": 200},
-        {"status_code": 302},
-        {"status_code": 302, "headers": {"Location": "https://example.com"}},
-    ])
-    def test_is_ecp_auth_redirect_false(self, requests_mock, response_kwargs):
-        # configure mock
-        requests_mock.get(
-            "https://test.domain.com",
-            **response_kwargs
-        )
-        if "Location" in response_kwargs.get("headers", {}):
-            requests_mock.get(response_kwargs["headers"]["Location"])
-
-        # execute mock request
-        resp = requests.get("https://test.domain.com", allow_redirects=False)
-
-        # test is_ecp_auth_redirect
-        assert not self.TEST_CLASS.is_ecp_auth_redirect(resp)
-
     @mock.patch(
-        "requests_ecp.auth.HTTPECPAuth.is_ecp_auth_redirect",
+        "requests_ecp.auth.is_ecp_auth_redirect",
         return_value=False,
     )
     def test_handle_response_noauth(self, _, requests_mock):
@@ -132,7 +139,7 @@ class TestHTTPECPAuth(object):
         assert session.auth._num_ecp_auth == 0
 
     @mock.patch(
-        "requests_ecp.auth.HTTPECPAuth.is_ecp_auth_redirect",
+        "requests_ecp.auth.is_ecp_auth_redirect",
         return_value=True,
     )
     @mock.patch(

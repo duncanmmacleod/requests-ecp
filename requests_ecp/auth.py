@@ -36,6 +36,8 @@ except ModuleNotFoundError:  # pragma: no cover
 from .ecp import authenticate as ecp_authenticate
 
 
+# -- Auth utilities ---------
+
 def _prompt_username_password(host, username=None):
     """Prompt for a username and password from the console
     """
@@ -46,6 +48,39 @@ def _prompt_username_password(host, username=None):
     )
     return username, password
 
+
+# -- Response interception --
+
+def is_ecp_auth_redirect(response):
+    """Return `True` if a response indicates a request for ECP authentication.
+
+    Parameters
+    ----------
+    response : `requests.Response`
+        The response object to inspect.
+
+    Returns
+    -------
+    state : bool
+        `True` if ``response`` looks like a redirect initiated by Shibboleth,
+        otherwise `False`.
+    """
+    if not response.is_redirect:
+        return False
+
+    # strip out the redirect location and parse it
+    target = response.headers['location']
+    query = urllib_parse.parse_qs(urllib_parse.urlparse(target).query)
+
+    return (
+        # Identity Provider
+        "SAMLRequest" in query
+        # Shibboleth discovery service
+        or "Shibboleth.sso" in target
+    )
+
+
+# -- Auth -------------------
 
 class HTTPECPAuth(requests_auth.AuthBase):
     def __init__(
@@ -129,26 +164,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
             **kwargs,
         )
 
-    # -- auth discovery -----
-
-    @staticmethod
-    def is_ecp_auth_redirect(response):
-        """Return `True` if a response indicates a request for authentication
-        """
-        if not response.is_redirect:
-            return False
-
-        # strip out the redirect location and parse it
-        target = response.headers['location']
-        if isinstance(target, bytes):
-            target = target.decode("utf-8")
-        query = urllib_parse.parse_qs(urllib_parse.urlparse(target).query)
-
-        return (
-                "SAMLRequest" in query or  # redirected to IdP
-                "Shibboleth.sso" in target  # Shibboleth discovery service
-        )
-
     # -- event handling -----
 
     def handle_response(self, response, **kwargs):
@@ -157,7 +172,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
         # if the request was redirected in a way that looks like the SP
         # is asking for ECP authentication, then handle that here:
         # (but only do that once)
-        if self.is_ecp_auth_redirect(response) and not self._num_ecp_auth:
+        if is_ecp_auth_redirect(response) and not self._num_ecp_auth:
             # authenticate (preserving the history)
             response.history.extend(
                 self._authenticate_response(response, **kwargs),
