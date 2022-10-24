@@ -32,6 +32,17 @@ import requests_ecp
 from requests_ecp import auth as requests_ecp_auth
 
 
+def mock_authenticate_response(url):
+    """Mock the output of :meth:`requests_ecp.HTTPECPAuth._authenticate`.
+    """
+    responses = [requests.Response(), requests.Response(), requests.Response()]
+    responses[0].status_code = 200  # SP PAOS request
+    responses[1].status_code = 200  # IdP SOAP response
+    responses[2].status_code = 302  # SP response
+    responses[2].headers['location'] = url
+    return responses
+
+
 @pytest.mark.parametrize("location", [
     # IdP
     "https://idp.test.com/?SAMLRequest=12345",
@@ -143,6 +154,8 @@ def test_is_gitlab_auth_redirect_false(requests_mock, response_kwargs):
 class TestHTTPECPAuth(object):
     TEST_CLASS = requests_ecp.HTTPECPAuth
 
+    # -- test init ----------
+
     @mock.patch("requests_ecp.auth.input", return_value="user")
     @mock.patch("requests_ecp.auth.getpass", return_value="passwd")
     def test_init_auth(self, input_, getpass_):
@@ -187,6 +200,8 @@ class TestHTTPECPAuth(object):
         assert isinstance(auth, requests_ecp_auth.HTTPKerberosAuth)
         assert auth.hostname_override == "kerberos.test.com"
 
+    # -- test handle_response
+
     @mock.patch(
         "requests_ecp.auth.is_ecp_auth_redirect",
         return_value=False,
@@ -208,6 +223,7 @@ class TestHTTPECPAuth(object):
     )
     @mock.patch(
         "requests_ecp.auth.HTTPECPAuth._authenticate",
+        return_value=mock_authenticate_response("https://test"),
     )
     def test_handle_response_auth(self, mock_authenticate, _, requests_mock):
         requests_mock.get("https://test")
@@ -221,9 +237,9 @@ class TestHTTPECPAuth(object):
         # assert that _authenticate got passed some stuff
         # devwarning: this might be a bit flaky if requests change the api
         mock_authenticate.assert_called_once_with(
-            response.connection,
+            requests_mock._adapter,
             endpoint=None,
-            url=response.url,
+            url="https://test/",
             timeout=mock.ANY,
             verify=mock.ANY,
             proxies=mock.ANY,
@@ -232,6 +248,6 @@ class TestHTTPECPAuth(object):
         )
         # check that the header is hijacked properly to that requests
         # automatically retries the same URL
-        assert response.headers['location'] == "https://test/"
+        assert response.headers['location'] == "https://test"
         # make sure that we log that we did the auth loop
         assert session.auth._num_ecp_auth

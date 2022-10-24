@@ -70,6 +70,110 @@ SP_ECP_PAOS_RESPONSE = b"""
 </S:Envelope>
 """
 
+IDP_ECP_SOAP_RESPONSE = b"""
+<soap11:Envelope
+  xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap11:Header>
+    <ecp:Response
+      xmlns:ecp="urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp"
+      AssertionConsumerServiceURL="https://example.com/Shibboleth.sso/SAML2/ECP"
+      soap11:actor="http://schemas.xmlsoap.org/soap/actor/next"
+      soap11:mustUnderstand="1"/>
+    <samlec:GeneratedKey
+      xmlns:samlec="urn:ietf:params:xml:ns:samlec"
+      soap11:actor="http://schemas.xmlsoap.org/soap/actor/next"
+    >
+      srFbZAgDPKo6sBCn26u5bexUmhEZwF8mJkKUl9pMRhk=
+    </samlec:GeneratedKey>
+  </soap11:Header>
+  <soap11:Body>
+    <saml2p:Response
+      xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
+      Destination="https://example.com/Shibboleth.sso/SAML2/ECP"
+      ID="_546b6742a3ca678b9448ca38cb7e152d"
+      InResponseTo="_e78665d057736776d74e44778261fd00"
+      IssueInstant="2022-10-24T08:39:28.744Z"
+      Version="2.0"
+    >
+      <saml2:Issuer
+        xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+      >
+        https://login.ligo.org/idp/shibboleth
+      </saml2:Issuer>
+      <ds:Signature
+        xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+      >
+        <ds:SignedInfo>
+          <ds:CanonicalizationMethod
+            Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          <ds:SignatureMethod
+            Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+          <ds:Reference URI="#_546b6742a3ca678b9448ca38cb7e152d">
+            <ds:Transforms>
+              <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+              <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            </ds:Transforms>
+            <ds:DigestMethod
+              Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+              <ds:DigestValue>digest_value</ds:DigestValue>
+            </ds:Reference>
+          </ds:SignedInfo>
+          <ds:SignatureValue>
+            signature_value
+          </ds:SignatureValue>
+          <ds:KeyInfo>
+            <ds:X509Data>
+              <ds:X509Certificate>
+                x509_certificate
+              </ds:X509Certificate>
+            </ds:X509Data>
+          </ds:KeyInfo>
+        </ds:Signature>
+        <saml2p:Status>
+          <saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+        </saml2p:Status>
+        <saml2:EncryptedAssertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">
+          <xenc:EncryptedData
+            xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+            Id="_d5a7004ee158559a6df50abb7c53aa9b"
+            Type="http://www.w3.org/2001/04/xmlenc#Element"
+          >
+            <xenc:EncryptionMethod
+              xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+              Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+              <xenc:EncryptedKey
+                xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+                Id="_0750a2a3345f1d2d1c8b6a064c29e6da"
+                Recipient="https://example.com/shibboleth-sp"
+              >
+                <xenc:EncryptionMethod
+                  xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+                  Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"
+                >
+                  <ds:DigestMethod
+                    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+                    Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                </xenc:EncryptionMethod>
+            <ds:KeyInfo>
+              <ds:X509Data>
+                <ds:X509Certificate>x509_certificate</ds:X509Certificate>
+              </ds:X509Data>
+            </ds:KeyInfo>
+            <xenc:CipherData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+              <xenc:CipherValue>cipher_value</xenc:CipherValue>
+            </xenc:CipherData>
+          </xenc:EncryptedKey>
+        </ds:KeyInfo>
+        <xenc:CipherData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+          <xenc:CipherValue>cipher_value</xenc:CipherValue>
+          </xenc:CipherData>
+        </xenc:EncryptedData>
+      </saml2:EncryptedAssertion>
+    </saml2p:Response>
+  </soap11:Body>
+</soap11:Envelope>"""  # noqa
+
 
 def test_get_xml_attribute():
     """Test that `requests_ecp.auth._get_xml_attribute` works.
