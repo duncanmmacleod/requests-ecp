@@ -23,12 +23,8 @@ __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
 from getpass import getpass
 from urllib import parse as urllib_parse
-from urllib.error import URLError
 
-from requests import (
-    auth as requests_auth,
-    Request,
-)
+from requests import auth as requests_auth
 from requests.cookies import extract_cookies_to_jar
 
 try:
@@ -37,18 +33,7 @@ except ModuleNotFoundError:  # pragma: no cover
     # debian doesn't have requests-gssapi
     from requests_kerberos import HTTPKerberosAuth
 
-from lxml import etree
-
-
-def _get_xml_attribute(xdata, path):
-    """Parse an attribute from an XML document
-    """
-    namespaces = {
-        'ecp': 'urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp',
-        'S': 'http://schemas.xmlsoap.org/soap/envelope/',
-        'paos': 'urn:liberty:paos:2003-08'
-    }
-    return xdata.xpath(path, namespaces=namespaces)[0]
+from .ecp import authenticate as ecp_authenticate
 
 
 def _prompt_username_password(host, username=None):
@@ -99,36 +84,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
             username,
         ))
 
-    # -- utilities ----------
-
-    def _report_soap_fault(
-        self,
-        connection,
-        url,
-        message=(
-            "responseConsumerURL from SP and assertionConsumerServiceURL "
-            "from IdP do not match"
-        ),
-        **kwargs,
-    ):
-        """Report a problem with the SOAP configuration of SP/IdP pair.
-        """
-        request = Request(
-            method="POST",
-            url=url,
-            headers={'Content-Type': 'application/vnd.paos+xml'},
-            data=f"""
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-  <S:Body>
-    <S:Fault>
-      <faultcode>S:Server</faultcode>
-      <faultstring>{message}</faultstring>
-    </S:Fault>
-  </S:Body>
-</S:Envelope>""", # noqa
-        ).prepare()
-        return connection.send(request, **kwargs)
-
     # -- auth method --------
 
     def authenticate(self, session, endpoint=None, url=None, **kwargs):
@@ -153,15 +108,11 @@ class HTTPECPAuth(requests_auth.AuthBase):
             connection,
             endpoint=None,
             url=None,
-            cookies=None,
             **kwargs
     ):
-        """Handle user authentication with ECP
+        """Handle user authentication with ECP.
         """
-        endpoint = endpoint or self.idp
-        target = url or endpoint
-
-        if self._idpauth is None:
+        if self._idpauth is None:  # init auth now
             self._idpauth = self._init_auth(
                 self.idp,
                 kerberos=self.kerberos,
@@ -169,98 +120,14 @@ class HTTPECPAuth(requests_auth.AuthBase):
                 password=self.password,
             )
 
-        # -- step 1: initiate ECP request -----------
-
-        req1 = Request(
-            method="GET",
-            url=target,
-            cookies=cookies,
-            headers={
-                'Accept': 'text/html; application/vnd.paos+xml',
-                'PAOS': 'ver="urn:liberty:paos:2003-08";'
-                        '"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp"',
-            },
-        ).prepare()
-
-        # request target from SP
-        resp1 = connection.send(req1, **kwargs)
-
-        # convert the SP resonse from string to etree Element object
-        try:
-            spetree = etree.XML(resp1.content)
-        finally:
-            resp1.raw.release_conn()
-
-        # pick out the relay state element from the SP so that it can
-        # be included later in the response to the SP
-        relaystate = _get_xml_attribute(
-            spetree,
-            "//ecp:RelayState",
+        # authenticate
+        return ecp_authenticate(
+            connection,
+            self._idpauth,
+            endpoint or self.idp,
+            url=url,
+            **kwargs,
         )
-        rcurl = _get_xml_attribute(
-            spetree,
-            "/S:Envelope/S:Header/paos:Request/@responseConsumerURL",
-        )
-
-        # remote the SOAP header to create a packge for the IdP
-        idpbody = spetree
-        idpbody.remove(idpbody[0])
-
-        # -- step 2: authenticate with endpoint -----
-
-        req2 = Request(
-            method="POST",
-            url=endpoint,
-            auth=self._idpauth,
-            cookies=cookies,
-            data=etree.tostring(idpbody),
-            headers={"Content-Type": "text/xml; charset=utf-8"},
-        ).prepare()
-        resp2 = connection.send(req2, **kwargs)
-
-        # -- step 3: post back to the SP ------------
-
-        try:
-            idptree = etree.XML(resp2.content)
-        except etree.XMLSyntaxError:
-            raise RuntimeError(
-                "Failed to parse response from {}, you most "
-                "likely incorrectly entered your passphrase".format(
-                    endpoint,
-                ),
-            )
-        finally:
-            resp2.raw.release_conn()
-        acsurl = _get_xml_attribute(
-            idptree,
-            "/S:Envelope/S:Header/ecp:Response/@AssertionConsumerServiceURL",
-        )
-
-        # validate URLs between SP and IdP
-        if acsurl != rcurl:
-            try:
-                self._report_soap_fault(connection, rcurl)
-            except URLError:
-                pass  # don't care, just doing a service
-
-        # make a deep copy of the IdP response and replace its
-        # header contents with the relay state initially sent by
-        # the SP
-        actree = idptree
-        actree[0][0] = relaystate
-
-        # POST the package to the SP
-        req3 = Request(
-            method="POST",
-            url=acsurl,
-            cookies=cookies,
-            data=etree.tostring(actree),
-            headers={'Content-Type': 'application/vnd.paos+xml'},
-        ).prepare()
-        resp3 = connection.send(req3)
-
-        # return all responses
-        return resp1, resp2, resp3
 
     # -- auth discovery -----
 
