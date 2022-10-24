@@ -190,14 +190,14 @@ class HTTPECPAuth(requests_auth.AuthBase):
         """
         response.raw.read()
         response.raw.release_conn()
-        new = self._authenticate(
+        new = list(self._authenticate(
             response.connection,
             endpoint=endpoint,
             url=response.url,
             **kwargs,
-        )
-        r = new[-1]
-        r.history.extend([response] + new[:-1])
+        ))
+        r = new.pop(-1)
+        r.history.extend([response] + new)
         return r
 
     def _authenticate(
