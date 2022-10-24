@@ -35,6 +35,8 @@ except ModuleNotFoundError:  # pragma: no cover
 
 from .ecp import authenticate as ecp_authenticate
 
+GITLAB_AUTH_SHIB_CALLBACK_PATH = "/users/auth/shibboleth/callback"
+
 
 # -- Auth utilities ---------
 
@@ -78,6 +80,44 @@ def is_ecp_auth_redirect(response):
         # Shibboleth discovery service
         or "Shibboleth.sso" in target
     )
+
+
+def is_gitlab_auth_redirect(response):
+    """Return `True` if a response indicates a gitlab auth redirect.
+
+    Parameters
+    ----------
+    response : `requests.Response`
+        The response object to inspect.
+
+    Returns
+    -------
+    state : bool
+        `True` if ``response`` looks like a redirect initiated by GitLab,
+        otherwise `False`.
+    """
+    if not response.is_redirect:
+        return False
+
+    # if the redirect cam from the callback, then the callback doesn't work
+    # so let's not get stuck in an infinite loop
+    if urllib_parse.urlparse(response.url).path == GITLAB_AUTH_SHIB_CALLBACK_PATH:
+        return False
+
+    # parse the redirect target to get the gitlab host name
+    uparts = urllib_parse.urlparse(response.headers['location'])
+
+    # if not redirecting to login, this isn't meant for us
+    if not uparts.path == "/users/sign_in":
+        return False
+
+    # only redirect if there is a _gitlab_session cookie to use later
+    for cookie in response.cookies:
+        if (
+            cookie.name == "_gitlab_session"
+            and cookie.domain == uparts.hostname
+        ):
+            return True
 
 
 # -- Auth -------------------
@@ -177,10 +217,23 @@ class HTTPECPAuth(requests_auth.AuthBase):
         if self._num_ecp_auth:
             return response
 
+        # if the redirect looks like gitlab trying to go through ECP auth,
+        # redirect to the shibboleth callback for gitlab
+        if is_gitlab_auth_redirect(response):
+            # redirect the redirect to the shibboleth callback URL
+            parts = urllib_parse.urlparse(response.headers['location'])
+            response.headers['location'] = urllib_parse.urlunsplit((
+                parts.scheme,
+                parts.netloc,
+                GITLAB_AUTH_SHIB_CALLBACK_PATH,
+                parts.query,
+                parts.fragment,
+            ))
+
         # if the request was redirected in a way that looks like the SP
         # is asking for ECP authentication, then handle that here:
         # (but only do that once)
-        if is_ecp_auth_redirect(response):
+        elif is_ecp_auth_redirect(response):
             # authenticate (preserving the history)
             response.history.extend(
                 self._authenticate_response(response, **kwargs),

@@ -26,6 +26,8 @@ import pytest
 import requests
 from requests.auth import HTTPBasicAuth
 
+from requests_mock import CookieJar as MockCookieJar
+
 import requests_ecp
 from requests_ecp import auth as requests_ecp_auth
 
@@ -74,6 +76,68 @@ def test_is_ecp_auth_redirect_false(requests_mock, response_kwargs):
 
     # test is_ecp_auth_redirect
     assert not requests_ecp_auth.is_ecp_auth_redirect(resp)
+
+
+def test_is_gitlab_auth_redirect(requests_mock):
+    """Test that `is_gitlab_auth_redirect` returns `True` when it should.
+    """
+    # configure mock
+    jar = MockCookieJar()
+    jar.set("_gitlab_session", "value", domain="git.example.com")
+    requests_mock.get(
+        "https://git.example.com/user/project",
+        status_code=302,
+        headers={"Location": "https://git.example.com/users/sign_in"},
+        cookies=jar,
+    )
+
+    # execute mock request
+    resp = requests.get(
+        "https://git.example.com/user/project",
+        allow_redirects=False,
+    )
+
+    # test is_gitlab_auth_redirect
+    assert requests_ecp_auth.is_gitlab_auth_redirect(resp)
+
+
+@pytest.mark.parametrize("response_kwargs", [
+    # not a redirect
+    {"status_code": 200},
+    # redirect with no location
+    {"status_code": 302},
+    # redirect with the wrong location
+    {"status_code": 302,
+     "headers": {"Location": "https://git.example.com/login"},
+     },
+    # redirect from the callback itself (infinite loop)
+    {"status_code": 302,
+     "url": "https://git.example.com/users/auth/shibboleth/callback",
+     "headers": {"Location": "https://git.example.com/login"},
+     },
+    # redirect with the right location but no cookies
+    {"status_code": 302,
+     "headers": {"Location": "https://git.example.com/users/sign_in"},
+     "cookies": True,
+     },
+])
+def test_is_gitlab_auth_redirect_false(requests_mock, response_kwargs):
+    """Test that `is_gitlab_auth_redirect` returns `False` when it should.
+    """
+    url = response_kwargs.pop("url", "https://git.example.com/user/project")
+
+    # configure mock
+    if response_kwargs.get("cookies") is True:
+        # insert the wrong cookie into the jar
+        response_kwargs["cookies"] = jar = MockCookieJar()
+        jar.set("_shib_session", "value", domain="login.ligo.org")
+    requests_mock.get(url, **response_kwargs)
+
+    # execute mock request
+    resp = requests.get(url, allow_redirects=False)
+
+    # test is_gitlab_auth_redirect
+    assert not requests_ecp_auth.is_gitlab_auth_redirect(resp)
 
 
 class TestHTTPECPAuth(object):
