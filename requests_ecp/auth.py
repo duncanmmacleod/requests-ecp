@@ -101,19 +101,28 @@ class HTTPECPAuth(requests_auth.AuthBase):
 
     # -- utilities ----------
 
-    def _report_soap_fault(self, connection, url, **kwargs):
-        """Report a problem with the SOAP configuration of SP/IdP pair
+    def _report_soap_fault(
+        self,
+        connection,
+        url,
+        message=(
+            "responseConsumerURL from SP and assertionConsumerServiceURL "
+            "from IdP do not match"
+        ),
+        **kwargs,
+    ):
+        """Report a problem with the SOAP configuration of SP/IdP pair.
         """
         request = Request(
             method="POST",
             url=url,
             headers={'Content-Type': 'application/vnd.paos+xml'},
-            data="""
+            data=f"""
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <S:Fault>
       <faultcode>S:Server</faultcode>
-      <faultstring>responseConsumerURL from SP and assertionConsumerServiceURL from IdP do not match</faultstring>
+      <faultstring>{message}</faultstring>
     </S:Fault>
   </S:Body>
 </S:Envelope>""", # noqa
