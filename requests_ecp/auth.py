@@ -119,6 +119,9 @@ class HTTPECPAuth(requests_auth.AuthBase):
             username,
         ))
 
+    def reset(self):
+        self._num_ecp_auth = 0
+
     # -- auth method --------
 
     def authenticate(self, session, endpoint=None, url=None, **kwargs):
@@ -169,10 +172,15 @@ class HTTPECPAuth(requests_auth.AuthBase):
     def handle_response(self, response, **kwargs):
         """Handle ECP authentication based on a transation response
         """
+        # if we've already tried, don't try again,
+        # otherwise we end up in an infinite loop
+        if self._num_ecp_auth:
+            return response
+
         # if the request was redirected in a way that looks like the SP
         # is asking for ECP authentication, then handle that here:
         # (but only do that once)
-        if is_ecp_auth_redirect(response) and not self._num_ecp_auth:
+        if is_ecp_auth_redirect(response):
             # authenticate (preserving the history)
             response.history.extend(
                 self._authenticate_response(response, **kwargs),
@@ -181,8 +189,6 @@ class HTTPECPAuth(requests_auth.AuthBase):
             # and hijack the redirect back to itself
             response.headers['location'] = response.url
             self._num_ecp_auth += 1
-        else:
-            self._num_ecp_auth = 0
 
         return response
 
@@ -190,9 +196,11 @@ class HTTPECPAuth(requests_auth.AuthBase):
         """Deregister the response handler
         """
         response.request.deregister_hook('response', self.handle_response)
+        self.reset()
 
     def __call__(self, request):
         """Register the response handler
         """
+        self.reset()
         request.register_hook('response', self.handle_response)
         return request
