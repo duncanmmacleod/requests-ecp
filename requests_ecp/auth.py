@@ -22,7 +22,11 @@
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
 from getpass import getpass
-from urllib import parse as urllib_parse
+from urllib.parse import (
+    parse_qs,
+    urlparse,
+    urlunsplit,
+)
 
 from requests import auth as requests_auth
 from requests.cookies import extract_cookies_to_jar
@@ -72,7 +76,7 @@ def is_ecp_auth_redirect(response):
 
     # strip out the redirect location and parse it
     target = response.headers['location']
-    query = urllib_parse.parse_qs(urllib_parse.urlparse(target).query)
+    query = parse_qs(urlparse(target).query)
 
     return (
         # Identity Provider
@@ -101,11 +105,11 @@ def is_gitlab_auth_redirect(response):
 
     # if the redirect cam from the callback, then the callback doesn't work
     # so let's not get stuck in an infinite loop
-    if urllib_parse.urlparse(response.url).path == GITLAB_AUTH_SHIB_CALLBACK_PATH:
+    if urlparse(response.url).path == GITLAB_AUTH_SHIB_CALLBACK_PATH:
         return False
 
     # parse the redirect target to get the gitlab host name
-    uparts = urllib_parse.urlparse(response.headers['location'])
+    uparts = urlparse(response.headers['location'])
 
     # if not redirecting to login, this isn't meant for us
     if not uparts.path == "/users/sign_in":
@@ -147,7 +151,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
     def _init_auth(idp, kerberos=False, username=None, password=None):
         if kerberos:
             url = kerberos if isinstance(kerberos, str) else idp
-            loginhost = urllib_parse.urlparse(url).netloc.split(':')[0]
+            loginhost = urlparse(url).netloc.split(':')[0]
             return HTTPKerberosAuth(
                 force_preemptive=True,
                 hostname_override=loginhost,
@@ -155,7 +159,7 @@ class HTTPECPAuth(requests_auth.AuthBase):
         elif username and password:
             return requests_auth.HTTPBasicAuth(username, password)
         return requests_auth.HTTPBasicAuth(*_prompt_username_password(
-            urllib_parse.urlparse(idp).hostname,
+            urlparse(idp).hostname,
             username,
         ))
 
@@ -221,8 +225,8 @@ class HTTPECPAuth(requests_auth.AuthBase):
         # redirect to the shibboleth callback for gitlab
         if is_gitlab_auth_redirect(response):
             # redirect the redirect to the shibboleth callback URL
-            parts = urllib_parse.urlparse(response.headers['location'])
-            response.headers['location'] = urllib_parse.urlunsplit((
+            parts = urlparse(response.headers['location'])
+            response.headers['location'] = urlunsplit((
                 parts.scheme,
                 parts.netloc,
                 GITLAB_AUTH_SHIB_CALLBACK_PATH,
