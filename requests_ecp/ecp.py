@@ -95,6 +95,7 @@ def authenticate(
 
     # request target from SP
     resp1 = connection.send(req1, **kwargs)
+    resp1.raise_for_status()
 
     # convert the SP resonse from string to etree Element object
     try:
@@ -128,6 +129,7 @@ def authenticate(
         headers={"Content-Type": "text/xml; charset=utf-8"},
     ).prepare()
     resp2 = connection.send(req2, **kwargs)
+    resp2.raise_for_status()
 
     # -- step 3: post back to the SP ------------
 
@@ -169,6 +171,7 @@ def authenticate(
         headers={'Content-Type': 'application/vnd.paos+xml'},
     ).prepare()
     resp3 = connection.send(req3)
+    resp3.raise_for_status()
 
     # return all responses
     return resp1, resp2, resp3
