@@ -1,6 +1,19 @@
 [build-system]
 requires = [
-    "setuptools>=30.3.0",
-    "wheel",
+  "setuptools>=30.3.0",
+  "wheel",
 ]
 build-backend = "setuptools.build_meta"
+
+# -- tools
+
+[tool.coverage.report]
+precision = 1
+
+[tool.coverage.run]
+source = [
+  "ciecplib"
+]
+
+[tool.pytest.ini_options]
+addopts = "-r a"
