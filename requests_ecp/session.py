@@ -29,7 +29,27 @@ from .auth import HTTPECPAuth
 
 
 class ECPAuthSessionMixin:
-    """A mixin for `requests.Session` to add default ECP Auth
+    """A mixin for `requests.Session` to add default ECP Auth.
+
+    This creates a default `~requests.Session.auth` attribute on created
+    `~requests.Session` objects as an instance of the
+    `~requests_ecp.HTTPECPAuth` authorisation plugin:
+
+    .. code-block:: python
+
+       from requests import Session
+       from requests_ecp import ECPAuthSessionMixin
+       class MySession(ECPAuthSessionMixin, Session):
+           pass
+
+    This can be mixed with any other `~requests.Session` mixins, but beware
+    of the inheritance order that may impact which mixin preserves the final
+    `~requests.Session.auth` attribute.
+
+    See also
+    --------
+    requests_ecp.Session
+        For a ready-made wrapped `~requests.Session`.
     """
     def __init__(
             self,
@@ -49,7 +69,20 @@ class ECPAuthSessionMixin:
 
 
 class Session(ECPAuthSessionMixin, _Session):
-    """A `requests.Session` with default ECP authentication
+    """A `requests.Session` wrapper with default SAML/ECP authentication.
+
+    To start a `~requests.Session` to handle ECP authentication with a
+    particular Identity Provider (IdP) pass the ``idp`` argument with the
+    URL of the ECP endpoint or the IdP.
+    For any individual requests in this `~requests.Session`
+    that are redirected to a SAML/Shibboleth authentication page/app the
+    `~requests_ecp.HTTPECPAuth` authorisation plugin will automatically
+    intercept the redirect and invoke a SAML/ECP authorisation workflow:
+
+    >>> from requests_ecp import Session
+    >>> with Session(idp="https://idp.example.com/SAML/SOAP/ECP") as sess:
+    ...     sess.get("https://private.example.com/data")
+
     """
     def ecp_authenticate(self, url, endpoint=None, **kwargs):
         """Manually authenticate against the endpoint.
