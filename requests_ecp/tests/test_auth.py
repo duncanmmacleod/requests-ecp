@@ -185,19 +185,35 @@ class TestHTTPECPAuth(object):
         assert auth.password == "mypasswd"
 
     def test_init_auth_kerberos(self):
+        requests_gssapi = pytest.importorskip("requests_gssapi")
         auth = self.TEST_CLASS._init_auth(
             "https://idp.test.com",
             kerberos=True,
         )
-        assert isinstance(auth, requests_ecp_auth.HTTPKerberosAuth)
+        assert isinstance(auth, requests_gssapi.HTTPKerberosAuth)
         assert auth.hostname_override == "idp.test.com"
 
+    @mock.patch.dict("sys.modules", {
+        "requests_gssapi": None,
+        "requests_kerberos": None,
+    })
+    def test_init_auth_kerberos_error(self):
+        """Test that `HTTPECPAuth` raises a useful exception
+        if requests-gssapi isn't available.
+        """
+        with pytest.raises(
+            ImportError,
+            match="you must install requests-gssapi",
+        ):
+            self.TEST_CLASS(None, kerberos=True)
+
     def test_init_auth_kerberos_url(self):
+        requests_gssapi = pytest.importorskip("requests_gssapi")
         auth = self.TEST_CLASS._init_auth(
             "https://idp.test.com",
             kerberos="https://kerberos.test.com/idp/",
         )
-        assert isinstance(auth, requests_ecp_auth.HTTPKerberosAuth)
+        assert isinstance(auth, requests_gssapi.HTTPKerberosAuth)
         assert auth.hostname_override == "kerberos.test.com"
 
     # -- test handle_response
