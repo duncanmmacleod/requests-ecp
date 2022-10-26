@@ -26,43 +26,44 @@
 Installation
 ============
 
-.. tabs::
+.. tabbed:: Conda
 
-   .. tab:: Conda
+    .. code-block:: bash
 
-      .. code-block:: bash
+        conda install -c conda-forge requests-ecp
 
-          conda install -c conda-forge requests-ecp
+    Installing with Conda (or Mamba) is the recommended installation
+    method for `requests-ecp`.
 
-   .. tab:: Debian Linux
+.. tabbed:: Debian Linux
 
-      .. code-block:: bash
+    .. code-block:: bash
 
-          apt-get install python3-requests-ecp
+        apt-get install python3-requests-ecp
 
-      See the IGWN Computing Guide software repositories entry for
-      `Debian <https://computing.docs.ligo.org/guide/software/debian/>`__
-      for instructions on how to configure the required
-      IGWN Debian repositories.
+    See the IGWN Computing Guide software repositories entry for
+    `Debian <https://computing.docs.ligo.org/guide/software/debian/>`__
+    for instructions on how to configure the required
+    IGWN Debian repositories.
 
-   .. tab:: Pip
+.. tabbed:: Pip
 
-      .. code-block:: bash
+    .. code-block:: bash
 
-          python -m pip install requests-ecp
+        python -m pip install requests-ecp
 
-   .. tab:: Scientific Linux
+.. tabbed:: Scientific Linux
 
-      .. code-block:: bash
+   .. code-block:: bash
 
-          yum install python3-requests-ecp
+       yum install python3-requests-ecp
 
-      See the IGWN Computing Guide software repositories entries for
-      `Scientific Linux 7
-      <https://computing.docs.ligo.org/guide/software/sl7/>`__
-      or
-      `Rocky Linux 8 <https://computing.docs.ligo.org/guide/software/rl8/>`__
-      for instructions on how to configure the required IGWN Yum repositories.
+   See the IGWN Computing Guide software repositories entries for
+   `Scientific Linux 7
+   <https://computing.docs.ligo.org/guide/software/sl7/>`__
+   or
+   `Rocky Linux 8 <https://computing.docs.ligo.org/guide/software/rl8/>`__
+   for instructions on how to configure the required IGWN Yum repositories.
 
 ==============================
 ``requests-ecp`` documentation
