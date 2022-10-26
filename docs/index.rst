@@ -32,6 +32,10 @@ Installation
 
         conda install -c conda-forge requests-ecp
 
+    The conda package includes the optional Kerberos Auth plugin
+    from ``requests-gssapi``, which in turn ensures that a working
+    GSSAPI implementation is installed.
+
     Installing with Conda (or Mamba) is the recommended installation
     method for `requests-ecp`.
 
@@ -51,6 +55,26 @@ Installation
     .. code-block:: bash
 
         python -m pip install requests-ecp
+
+    .. admonition:: Default ``pip install`` doesn't include Kerberos Auth support
+
+       By default ``pip install requests-ecp`` does not bundle
+       Kerberos auth support.
+       This is provided by the
+       `requests-gssapi <https://github.com/pythongssapi/requests-gssapi>`__
+       package, which in turn relies on a working installation of GSSAPI
+       (such as MIT Kerberos).
+
+       The ``requests-ecp[kerberos]`` extra can be used to automatically
+       include ``requests-gssapi``:
+
+       .. code-block:: shell
+
+           python -m pip install requests-ecp[kerberos]
+
+       If you need Kerberos auth, and need to install GSSAPI itself on your
+       system, it is recommended that you
+       **use Conda to install `requests-ecp`**.
 
 .. tabbed:: Scientific Linux
 
