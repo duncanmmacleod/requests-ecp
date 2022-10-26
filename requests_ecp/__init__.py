@@ -29,7 +29,7 @@ Basic usage:
 """
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
-__version__ = "0.2.3"
+__version__ = "0.3.0"
 
 from .auth import HTTPECPAuth
 from .session import (

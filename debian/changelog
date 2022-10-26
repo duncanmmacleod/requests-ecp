@@ -1,3 +1,11 @@
+requests-ecp (0.3.0-1) unstable; urgency=low
+
+  * update for 0.3.0
+  * remove unnecessary patches for requests-kerberos, which
+    is now optional in the Python metadata
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Wed, 26 Oct 2022 14:56:00 +0100
+
 requests-ecp (0.2.3-1) unstable; urgency=low
 
   * move to python3-gssapi as kerberos backend in main package,
