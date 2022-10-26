@@ -26,43 +26,68 @@
 Installation
 ============
 
-.. tabs::
+.. tabbed:: Conda
 
-   .. tab:: Conda
+    .. code-block:: bash
 
-      .. code-block:: bash
+        conda install -c conda-forge requests-ecp
 
-          conda install -c conda-forge requests-ecp
+    The conda package includes the optional Kerberos Auth plugin
+    from ``requests-gssapi``, which in turn ensures that a working
+    GSSAPI implementation is installed.
 
-   .. tab:: Debian Linux
+    Installing with Conda (or Mamba) is the recommended installation
+    method for `requests-ecp`.
 
-      .. code-block:: bash
+.. tabbed:: Debian Linux
 
-          apt-get install python3-requests-ecp
+    .. code-block:: bash
 
-      See the IGWN Computing Guide software repositories entry for
-      `Debian <https://computing.docs.ligo.org/guide/software/debian/>`__
-      for instructions on how to configure the required
-      IGWN Debian repositories.
+        apt-get install python3-requests-ecp
 
-   .. tab:: Pip
+    See the IGWN Computing Guide software repositories entry for
+    `Debian <https://computing.docs.ligo.org/guide/software/debian/>`__
+    for instructions on how to configure the required
+    IGWN Debian repositories.
 
-      .. code-block:: bash
+.. tabbed:: Pip
 
-          python -m pip install requests-ecp
+    .. code-block:: bash
 
-   .. tab:: Scientific Linux
+        python -m pip install requests-ecp
 
-      .. code-block:: bash
+    .. admonition:: Default ``pip install`` doesn't include Kerberos Auth support
 
-          yum install python3-requests-ecp
+       By default ``pip install requests-ecp`` does not bundle
+       Kerberos auth support.
+       This is provided by the
+       `requests-gssapi <https://github.com/pythongssapi/requests-gssapi>`__
+       package, which in turn relies on a working installation of GSSAPI
+       (such as MIT Kerberos).
 
-      See the IGWN Computing Guide software repositories entries for
-      `Scientific Linux 7
-      <https://computing.docs.ligo.org/guide/software/sl7/>`__
-      or
-      `Rocky Linux 8 <https://computing.docs.ligo.org/guide/software/rl8/>`__
-      for instructions on how to configure the required IGWN Yum repositories.
+       The ``requests-ecp[kerberos]`` extra can be used to automatically
+       include ``requests-gssapi``:
+
+       .. code-block:: shell
+
+           python -m pip install requests-ecp[kerberos]
+
+       If you need Kerberos auth, and need to install GSSAPI itself on your
+       system, it is recommended that you
+       **use Conda to install `requests-ecp`**.
+
+.. tabbed:: Scientific Linux
+
+   .. code-block:: bash
+
+       yum install python3-requests-ecp
+
+   See the IGWN Computing Guide software repositories entries for
+   `Scientific Linux 7
+   <https://computing.docs.ligo.org/guide/software/sl7/>`__
+   or
+   `Rocky Linux 8 <https://computing.docs.ligo.org/guide/software/rl8/>`__
+   for instructions on how to configure the required IGWN Yum repositories.
 
 ==============================
 ``requests-ecp`` documentation

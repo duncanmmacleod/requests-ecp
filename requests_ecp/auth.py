@@ -30,12 +30,6 @@ from urllib.parse import (
 
 from requests import auth as requests_auth
 
-try:
-    from requests_gssapi import HTTPKerberosAuth
-except ModuleNotFoundError:  # pragma: no cover
-    # debian doesn't have requests-gssapi
-    from requests_kerberos import HTTPKerberosAuth
-
 from .ecp import authenticate as ecp_authenticate
 
 GITLAB_AUTH_SHIB_CALLBACK_PATH = "/users/auth/shibboleth/callback"
@@ -125,6 +119,33 @@ def is_gitlab_auth_redirect(response):
 
 # -- Auth -------------------
 
+def _import_kerberos_auth():
+    try:
+        from requests_gssapi import HTTPKerberosAuth
+    except ModuleNotFoundError as exc:  # pragma: no cover
+        try:
+            # debian doesn't have requests-gssapi
+            from requests_kerberos import HTTPKerberosAuth
+        except ModuleNotFoundError:
+            # no kerberos interface, display a useful error message
+            raise ModuleNotFoundError(
+                f"{exc.msg}; you must install requests-gssapi "
+                "to use Kerberos auth"
+            ) from exc
+    return HTTPKerberosAuth
+
+
+def _kerberos_auth(url):
+    """Intialise a `requests_gssapi.HTTPKerberosAuth`.
+    """
+    HTTPKerberosAuth = _import_kerberos_auth()
+    loginhost = urlparse(url).hostname
+    return HTTPKerberosAuth(
+        force_preemptive=True,
+        hostname_override=loginhost,
+    )
+
+
 class HTTPECPAuth(requests_auth.AuthBase):
     """SAML2/ECP authorisation plugin for :mod:`requests`.
 
@@ -156,6 +177,8 @@ class HTTPECPAuth(requests_auth.AuthBase):
 
         #: Authentication object to attach to requests made directly
         #: to the IdP.
+        if kerberos:  # raise an ImportError early
+            _import_kerberos_auth()
         self.kerberos = kerberos
         self.username = username
         self.password = password
@@ -167,11 +190,8 @@ class HTTPECPAuth(requests_auth.AuthBase):
     @staticmethod
     def _init_auth(idp, kerberos=False, username=None, password=None):
         if kerberos:
-            url = kerberos if isinstance(kerberos, str) else idp
-            loginhost = urlparse(url).netloc.split(':')[0]
-            return HTTPKerberosAuth(
-                force_preemptive=True,
-                hostname_override=loginhost,
+            return _kerberos_auth(
+                kerberos if isinstance(kerberos, str) else idp,
             )
         elif username and password:
             return requests_auth.HTTPBasicAuth(username, password)
