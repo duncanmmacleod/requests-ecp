@@ -1,5 +1,5 @@
 %define name requests-ecp
-%define version 0.2.3
+%define version 0.3.0
 %define release 1
 
 # -- metadata ---------------
@@ -81,6 +81,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Wed Oct 26 2022 Duncan Macleod <duncan.macleod@ligo.org> - 0.3.0-1
+- update for 0.3.0
+
 * Mon Nov 22 2021 Duncan Macleod <duncan.macleod@ligo.org> - 0.2.3-1
 - update for 0.2.3
 - use python3-gssapi as the kerberos backend
