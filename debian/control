@@ -13,7 +13,7 @@ Build-Depends:
  python3-all,
  python3-lxml,
  python3-pytest,
- python3-requests,
+ python3-requests (>= 2.14.0),
  python3-requests-gssapi (>= 1.2.2) | python3-requests-kerberos (>= 0.9.0),
  python3-requests-mock,
  python3-setuptools (>= 30.3.0),
@@ -26,7 +26,7 @@ Depends:
  ${misc:Depends},
  ${python3:Depends},
  python3-lxml,
- python3-requests,
+ python3-requests (>= 2.14.0),
  python3-requests-gssapi (>= 1.2.2) | python3-requests-kerberos (>= 0.9.0),
 Description: SAML/ECP authentication handler for Requests
  requests-ecp adds optional SAML/ECP authentication support
