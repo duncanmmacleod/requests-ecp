@@ -21,8 +21,9 @@ Version:   %{version}
 
 BuildRequires: python-srpm-macros
 BuildRequires: python-rpm-macros
-BuildRequires: /usr/bin/python3
 BuildRequires: python3-rpm-macros
+
+BuildRequires: %{__python3}
 BuildRequires: python%{python3_pkgversion}-lxml
 BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-requests-gssapi >= 1.2.2
