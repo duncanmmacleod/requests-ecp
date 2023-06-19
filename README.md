@@ -12,7 +12,7 @@ A SAML/ECP authentication handler for python-requests.
 
 ## Development status
 
-[![Build status](https://github.com/duncanmmacleod/requests-ecp/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/duncanmmacleod/requests-ecp/actions/workflows/build.yml)
+[![Build status](https://github.com/duncanmmacleod/requests-ecp/actions/workflows/python.yml/badge.svg?branch=main)](https://github.com/duncanmmacleod/requests-ecp/actions/workflows/python.yml)
 [![Codecov](https://codecov.io/gh/duncanmmacleod/requests-ecp/branch/main/graph/badge.svg?token=PO7lRIPpTm)](https://codecov.io/gh/duncanmmacleod/requests-ecp)
 [![Maintainability](https://api.codeclimate.com/v1/badges/9b10bd39e588fd5a34ab/maintainability)](https://codeclimate.com/github/duncanmmacleod/requests-ecp/maintainability)
 [![Documentation](https://readthedocs.org/projects/requests-ecp/badge/?version=latest)](https://requests-ecp.readthedocs.io/en/latest/?badge=latest)
