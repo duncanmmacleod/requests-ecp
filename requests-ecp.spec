@@ -19,10 +19,6 @@ Version:   %{version}
 
 # -- build requirements -----
 
-BuildRequires: python-srpm-macros
-BuildRequires: python-rpm-macros
-BuildRequires: python3-rpm-macros
-
 BuildRequires: python%{python3_pkgversion}-devel
 BuildRequires: python%{python3_pkgversion}-lxml
 BuildRequires: python%{python3_pkgversion}-requests

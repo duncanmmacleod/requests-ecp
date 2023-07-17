@@ -242,6 +242,10 @@ jobs:
             name: Rocky Linux
             version: 8
             container: rockylinux:8
+          - dist: rockylinux
+            name: Rocky Linux
+            version: 9
+            container: rockylinux:9
           - dist: fedora
             name: Fedora
             version: latest
@@ -298,6 +302,10 @@ jobs:
             name: Rocky Linux
             version: 8
             container: rockylinux:8
+          - dist: rockylinux
+            name: Rocky Linux
+            version: 9
+            container: rockylinux:9
           - dist: fedora
             name: Fedora
             version: latest
@@ -315,6 +323,12 @@ jobs:
       - name: Configure DNF
         if: matrix.dist == 'lscsoft'
         run: ln -s /usr/bin/yum /usr/bin/dnf
+
+      - name: Enable CRB (Rocky Linux >=9)
+        if: matrix.dist == 'rockylinux' && matrix.version >= 9
+        run: |
+          dnf -y -q install "dnf-command(config-manager)"
+          dnf config-manager --set-enabled crb
 
       - name: Configure EPEL
         if: matrix.dist != 'fedora'
@@ -388,6 +402,10 @@ jobs:
             name: Rocky Linux
             version: 8
             container: rockylinux:8
+          - dist: rockylinux
+            name: Rocky Linux
+            version: 9
+            container: rockylinux:9
           - dist: fedora
             name: Fedora
             version: latest
@@ -416,20 +434,25 @@ jobs:
   lint-rhel:
     name: Lint RPMs
     runs-on: ubuntu-latest
-    container: rockylinux:8
+    container: rockylinux:9
     needs:
       - rhel-binary
     steps:
       - name: Download RPM
         uses: actions/download-artifact@v2
         with:
-          name: rpm-rockylinux-8
+          name: rpm-rockylinux-9
+
+      - name: Configure EPEL
+        if: matrix.dist != 'fedora'
+        run: dnf -y install epel-release
 
       - name: Install rpmlint
         run: |
           dnf -y -q install \
               rpmlint \
+              *.rpm \
           ;
 
       - name: Lint
-        run: rpmlint --info *.rpm
+        run: rpmlint --info python3-requests-ecp *.rpm
