@@ -437,11 +437,16 @@ jobs:
         with:
           name: rpm-rockylinux-9
 
+      - name: Configure EPEL
+        if: matrix.dist != 'fedora'
+        run: dnf -y install epel-release
+
       - name: Install rpmlint
         run: |
           dnf -y -q install \
               rpmlint \
+              *.rpm \
           ;
 
       - name: Lint
-        run: rpmlint --info *.rpm
+        run: rpmlint --info python3-requests-ecp *.rpm
