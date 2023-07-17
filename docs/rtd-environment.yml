@@ -2,13 +2,17 @@ name: requests-ecp
 channels:
   - conda-forge
 dependencies:
-  - lxml
-  - pip
   - python>=3
+  # build
+  - pip
+  - setuptools
+  # install
+  - lxml
   - requests
   - requests-gssapi>=1.2.2
+  # tests
   - requests-mock>=1.5.0
-  - setuptools
+  # docs
   - sphinx
   - sphinx_rtd_theme
   - sphinx-tabs
