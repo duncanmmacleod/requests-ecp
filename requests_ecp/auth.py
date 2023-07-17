@@ -21,6 +21,7 @@
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
+from datetime import timedelta
 from getpass import getpass
 from urllib.parse import (
     parse_qs,
@@ -29,6 +30,7 @@ from urllib.parse import (
 )
 
 from requests import auth as requests_auth
+from requests.sessions import preferred_clock
 
 from .ecp import authenticate as ecp_authenticate
 
@@ -274,6 +276,8 @@ class HTTPECPAuth(requests_auth.AuthBase):
         if self._num_ecp_auth:
             return response
 
+        start = preferred_clock() - response.elapsed.total_seconds()
+
         # if the redirect looks like gitlab trying to go through ECP auth,
         # redirect to the shibboleth callback for gitlab
         if is_gitlab_auth_redirect(response):
@@ -294,6 +298,9 @@ class HTTPECPAuth(requests_auth.AuthBase):
             # authenticate and return the final redirect
             response = self._authenticate_response(response, **kwargs)
             self._num_ecp_auth += 1
+
+        if response.is_redirect:
+            response.elapsed = timedelta(seconds=preferred_clock() - start)
 
         return response
 
