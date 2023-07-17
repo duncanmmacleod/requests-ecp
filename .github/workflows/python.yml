@@ -26,11 +26,11 @@ jobs:
           - Ubuntu
           - Windows
         python-version:
-          - "3.6"
           - "3.7"
           - "3.8"
           - "3.9"
           - "3.10"
+          - "3.11"
     runs-on: ${{ matrix.os }}-latest
 
     steps:
@@ -38,9 +38,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install requests-ecp
         run: python -m pip install .[tests]
