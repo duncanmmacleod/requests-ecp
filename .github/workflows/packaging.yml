@@ -242,6 +242,10 @@ jobs:
             name: Rocky Linux
             version: 8
             container: rockylinux:8
+          - dist: rockylinux
+            name: Rocky Linux
+            version: 9
+            container: rockylinux:9
           - dist: fedora
             name: Fedora
             version: latest
@@ -298,6 +302,10 @@ jobs:
             name: Rocky Linux
             version: 8
             container: rockylinux:8
+          - dist: rockylinux
+            name: Rocky Linux
+            version: 9
+            container: rockylinux:9
           - dist: fedora
             name: Fedora
             version: latest
@@ -388,6 +396,10 @@ jobs:
             name: Rocky Linux
             version: 8
             container: rockylinux:8
+          - dist: rockylinux
+            name: Rocky Linux
+            version: 9
+            container: rockylinux:9
           - dist: fedora
             name: Fedora
             version: latest
@@ -416,14 +428,14 @@ jobs:
   lint-rhel:
     name: Lint RPMs
     runs-on: ubuntu-latest
-    container: rockylinux:8
+    container: rockylinux:9
     needs:
       - rhel-binary
     steps:
       - name: Download RPM
         uses: actions/download-artifact@v2
         with:
-          name: rpm-rockylinux-8
+          name: rpm-rockylinux-9
 
       - name: Install rpmlint
         run: |
