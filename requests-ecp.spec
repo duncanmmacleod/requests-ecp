@@ -1,5 +1,5 @@
 %define name requests-ecp
-%define version 0.3.0
+%define version 0.3.1
 %define release 1
 
 # -- metadata ---------------
@@ -78,6 +78,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Mon Jul 17 2023 Duncan Macleod <duncan.macleod@ligo.org> - 0.3.1-1
+- update for 0.3.1
+
 * Wed Oct 26 2022 Duncan Macleod <duncan.macleod@ligo.org> - 0.3.0-1
 - update for 0.3.0
 
