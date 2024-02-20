@@ -24,7 +24,7 @@ from requests_ecp import __version__ as requests_ecp_version
 # -- Project information -----------------------------------------------------
 
 project = 'requests-ecp'
-copyright = '2020, Cardiff University'
+copyright = '2020-2024, Cardiff University'
 author = 'Duncan Macleod'
 
 # The full version, including alpha/beta/rc tags
@@ -42,7 +42,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_automodapi.automodapi",
-    "sphinx_panels",
+    "sphinx_design",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -59,7 +59,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -67,7 +67,7 @@ html_theme = 'sphinx_rtd_theme'
 #html_static_path = ['_static']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'monokai'
+#pygments_style = 'monokai'
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
