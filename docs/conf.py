@@ -24,7 +24,7 @@ from requests_ecp import __version__ as requests_ecp_version
 # -- Project information -----------------------------------------------------
 
 project = 'requests-ecp'
-copyright = '2020, Cardiff University'
+copyright = '2020-2024, Cardiff University'
 author = 'Duncan Macleod'
 
 # The full version, including alpha/beta/rc tags
