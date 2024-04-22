@@ -16,4 +16,4 @@ dependencies:
   - furo
   - sphinx
   - sphinx-tabs
-  - sphinx-automodapi
+  - sphinx-automodapi !=0.17.0
