@@ -45,7 +45,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: tarball
-          path: requests-ecp-*.tar.*
+          path: "*.tar.*"
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v3
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:${{ matrix.debian }}
     env:
-      TARBALL: "requests-ecp-*.tar.*"
+      TARBALL: "*.tar.*"
     steps:
       - name: Download tarball
         uses: actions/download-artifact@v3
@@ -253,7 +253,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     env:
-      TARBALL: "requests-ecp-*.tar.*"
+      TARBALL: "*.tar.*"
     steps:
       - name: Download tarball
         uses: actions/download-artifact@v3
