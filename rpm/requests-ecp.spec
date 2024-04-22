@@ -1,4 +1,5 @@
-%define name requests-ecp
+%define srcname requests-ecp
+%define distname %{lua:name = string.gsub(rpm.expand("%{srcname}"), "-", "_"); print(name)}
 %define version 0.3.1
 %define release 1
 
@@ -7,11 +8,11 @@
 BuildArch: noarch
 Group:     Development/Libraries
 License:   GPLv3+
-Name:      %{name}
+Name:      python-%{srcname}
 Packager:  Duncan Macleod <duncan.macleod@ligo.org>
 Prefix:    %{_prefix}
 Release:   %{release}%{?dist}
-Source0:   %pypi_source
+Source0:   %pypi_source %distname
 Summary:   A SAML/ECP authentication handler for python-requests
 Url:       https://github.com/duncanmmacleod/requests-ecp
 Vendor:    Duncan Macleod <duncan.macleod@ligo.org>
@@ -36,13 +37,13 @@ BuildRequires: python%{python3_pkgversion}-requests-mock
 requests-ecp adds optional SAML/ECP authentication support
 for the Requests Python library.
 
-%package -n python%{python3_pkgversion}-%{name}
+%package -n python%{python3_pkgversion}-%{srcname}
 Summary: %{summary}
 Requires: python%{python3_pkgversion}-lxml
 Requires: python%{python3_pkgversion}-requests
 Requires: python%{python3_pkgversion}-requests-gssapi >= 1.2.2
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
-%description -n python%{python3_pkgversion}-%{name}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
+%description -n python%{python3_pkgversion}-%{srcname}
 requests-ecp adds optional SAML/ECP authentication support
 for the Requests Python library.  This package provides
 the Python %{python3_version} library.
@@ -50,7 +51,7 @@ the Python %{python3_version} library.
 # -- build ------------------
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{distname}-%{version}
 
 %build
 %py3_build
@@ -70,7 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 
 # -- files ------------------
 
-%files -n python%{python3_pkgversion}-%{name}
+%files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/*

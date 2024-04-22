@@ -314,7 +314,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     env:
-      SRPM: "requests-ecp-*.src.rpm"
+      SRPM: "*.src.rpm"
     steps:
       - name: Download SRPM
         uses: actions/download-artifact@v3
