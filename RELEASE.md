@@ -19,7 +19,7 @@ with an actual release version.
 -   Bump versions and add changelog entries in OS packaging files:
 
     - `debian/changelog`
-    - `requests-ecp.spec`
+    - `rpm/requests-ecp.spec`
 
     and then commit the changes to the branch.
 
