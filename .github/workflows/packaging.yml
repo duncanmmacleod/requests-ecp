@@ -89,9 +89,10 @@ jobs:
         run: |
           mkdir src
           tar -xf ${TARBALL} -C src --strip-components=1
+          SOURCE_NAME=$(dpkg-parsechangelog -l src/debian/changelog -SSource || echo "\1")
           # rename tarball for debian orig
-          _orig=$(basename ${TARBALL} | sed 's|\(.*\)-\(.*\).\(tar\..*\)|\1_\2.orig.tar.gz|')
-          mv -v ${TARBALL} "${_orig}"
+          _orig=$(basename ${TARBALL} | sed "s|\(.*\)-\(.*\).\(tar\..*\)|${SOURCE_NAME}_\2.orig.\3|")
+          cp -r ${TARBALL} "${_orig}"
           # create debian source package files
           dpkg-source --build src
 
