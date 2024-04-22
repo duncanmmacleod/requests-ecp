@@ -64,7 +64,7 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - oldstable
+          - oldstable-backports
           - stable
           - testing
     runs-on: ubuntu-latest
@@ -113,7 +113,7 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - oldstable
+          - oldstable-backports
           - stable
           - testing
     runs-on: ubuntu-latest
@@ -142,9 +142,12 @@ jobs:
         shell: bash -ex {0}
         run: |
           cd src
-          if [[ "${{ matrix.debian }}" == *backports ]]; then BACKPORTS="-t ${{ matrix.debian }}"; fi
+          if [[ "${{ matrix.debian }}" == *backports ]]; then
+              . /etc/os-release
+              BACKPORTS="-t ${VERSION_CODENAME}-backports";
+          fi
           mk-build-deps \
-              --tool "apt-get -y -q ${BACKPORTS} -o Debug::pkgProblemResolver=yes --no-install-recommends" \
+              --tool "apt-get -y -q ${BACKPORTS:-} -o Debug::pkgProblemResolver=yes --no-install-recommends" \
               --install \
               --remove \
           ;
@@ -181,7 +184,7 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - oldstable
+          - oldstable-backports
           - stable
           - testing
     runs-on: ubuntu-latest
