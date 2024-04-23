@@ -20,11 +20,16 @@ Version:   %{version}
 
 # -- build requirements -----
 
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
+BuildRequires: pyproject-rpm-macros
+%endif
 BuildRequires: python%{python3_pkgversion}-devel
 BuildRequires: python%{python3_pkgversion}-lxml
+BuildRequires: python%{python3_pkgversion}-pip
 BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-requests-gssapi >= 1.2.2
 BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
+BuildRequires: python%{python3_pkgversion}-wheel
 %if 0%{?rhel} == 0 || 0%{?rhel} >= 8
 BuildRequires: python%{python3_pkgversion}-pytest
 BuildRequires: python%{python3_pkgversion}-requests-mock
@@ -52,17 +57,49 @@ the Python %{python3_version} library.
 
 %prep
 %autosetup -n %{distname}-%{version}
+# for RHEL < 9 hack together setup.{cfg,py} for old setuptools
+%if 0%{?rhel} > 0 || 0%{?rhel} < 9
+cat > setup.cfg <<EOF
+[metadata]
+name = %{srcname}
+version = %{version}
+author-email = %{packager}
+description = %{summary}
+license = %{license}
+license_files = LICENSE
+url = %{url}
+[options]
+packages = find:
+python_requires = >=3.5
+install_requires =
+	lxml
+	requests
+EOF
+cat > setup.py <<EOF
+from setuptools import setup
+setup()
+EOF
+%endif
 
 %build
-%py3_build
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
+%pyproject_wheel
+%else
+%py3_build_wheel
+%endif
 
 %install
-%py3_install
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
+%pyproject_install
+%else
+%py3_install_wheel %{distname}-%{version}-*.whl
+%endif
 
 %check
 %if 0%{?rhel} == 0 || 0%{?rhel} >= 8
 export PYTHONPATH="%{buildroot}%{python3_sitelib}"
 export PATH="%{buildroot}%{_bindir}:${PATH}"
+%{__python3} -m pip show %{srcname} -f
 %{__python3} -m pytest --verbose -ra --pyargs requests_ecp
 %endif
 
