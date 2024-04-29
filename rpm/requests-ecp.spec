@@ -1,6 +1,6 @@
 %define srcname requests-ecp
 %define distname %{lua:name = string.gsub(rpm.expand("%{srcname}"), "-", "_"); print(name)}
-%define version 0.3.1
+%define version 0.3.2
 %define release 1
 
 # -- metadata ---------------
@@ -116,6 +116,11 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog --------------
 
 %changelog
+* Mon Apr 29 2024 Duncan Macleod <duncan.macleod@ligo.org> - 0.3.2-1
+- update for 0.3.2
+- add legacy shims to pull metadata out of pyproject.toml
+- rename source rpm to python-requests-ecp
+
 * Mon Jul 17 2023 Duncan Macleod <duncan.macleod@ligo.org> - 0.3.1-1
 - update for 0.3.1
 
