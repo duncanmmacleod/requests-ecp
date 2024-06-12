@@ -58,9 +58,9 @@ docs = [
 ]
 
 [project.urls]
-"Bug Tracker" = "https://github.com/duncanmmacleod/requests-ecp/issues"
+"Bug Tracker" = "https://git.ligo.org/computing/software/requests-ecp/-/issues"
 "Documentation" = "https://requests-ecp.readthedocs.io/"
-"Source Code" = "https://github.com/duncanmmacleod/requests-ecp/"
+"Source Code" = "https://git.ligo.org/computing/software/requests-ecp/"
 
 # -- tools
 
