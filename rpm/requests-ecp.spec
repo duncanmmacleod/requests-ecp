@@ -14,7 +14,7 @@ Prefix:    %{_prefix}
 Release:   %{release}%{?dist}
 Source0:   %pypi_source %distname
 Summary:   A SAML/ECP authentication handler for python-requests
-Url:       https://github.com/duncanmmacleod/requests-ecp
+Url:       https://git.ligo.org/computing/software/requests-ecp
 Vendor:    Duncan Macleod <duncan.macleod@ligo.org>
 Version:   %{version}
 

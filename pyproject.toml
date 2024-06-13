@@ -58,11 +58,20 @@ docs = [
 ]
 
 [project.urls]
-"Bug Tracker" = "https://github.com/duncanmmacleod/requests-ecp/issues"
+"Bug Tracker" = "https://git.ligo.org/computing/software/requests-ecp/-/issues"
 "Documentation" = "https://requests-ecp.readthedocs.io/"
-"Source Code" = "https://github.com/duncanmmacleod/requests-ecp/"
+"Source Code" = "https://git.ligo.org/computing/software/requests-ecp/"
 
 # -- tools
+
+[tool.coverage.paths]
+# map standard install paths back to the source to
+# enable merging coverage of installed module from
+# multiple platforms
+source = [
+  "requests_ecp/",  # <-- source path, must come first
+  "*/requests_ecp/",  # <-- any installed path
+]
 
 [tool.coverage.report]
 precision = 1
@@ -73,7 +82,7 @@ source = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-r a"
+addopts = "-r a -v"
 
 [tool.setuptools]
 license-files = [ "LICENSE" ]
