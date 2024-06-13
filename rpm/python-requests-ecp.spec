@@ -70,7 +70,7 @@ license_files = LICENSE
 url = %{url}
 [options]
 packages = find:
-python_requires = >=3.5
+python_requires = >=3.6
 install_requires =
 	lxml
 	requests

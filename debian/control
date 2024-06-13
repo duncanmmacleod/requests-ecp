@@ -5,19 +5,19 @@ Section: python
 Priority: optional
 Maintainer: Duncan Macleod <duncan.macleod@ligo.org>
 Standards-Version: 4.2.1
-X-Python3-Version: >= 3.5
+X-Python3-Version: >= 3.6
 Homepage: https://git.ligo.org/computing/software/requests-ecp
 Build-Depends:
  debhelper-compat (= 13),
  dh-python,
  pybuild-plugin-pyproject,
- python3-all (>= 3.5),
+ python3-all (>= 3.6),
  python3-lxml,
  python3-pytest,
  python3-requests,
  python3-requests-gssapi (>= 1.2.2) | python3-requests-kerberos (>= 0.9.0),
  python3-requests-mock,
- python3-setuptools (>= 30.3.0),
+ python3-setuptools (>= 61.0.0),
 
 # -- python3-requests-ecp -----------------------------------------------------
 
