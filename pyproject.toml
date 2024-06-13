@@ -64,6 +64,15 @@ docs = [
 
 # -- tools
 
+[tool.coverage.paths]
+# map standard install paths back to the source to
+# enable merging coverage of installed module from
+# multiple platforms
+source = [
+  "requests_ecp/",  # <-- source path, must come first
+  "*/requests_ecp/",  # <-- any installed path
+]
+
 [tool.coverage.report]
 precision = 1
 
@@ -73,7 +82,7 @@ source = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-r a"
+addopts = "-r a -v"
 
 [tool.setuptools]
 license-files = [ "LICENSE" ]
