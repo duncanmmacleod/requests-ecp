@@ -21,6 +21,7 @@ var/
 .installed.cfg
 *.egg
 MANIFEST
+debian/files
 debian/python3-requests-ecp/
 debian/*debhelper*
 debian/*substvars
