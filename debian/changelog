@@ -1,3 +1,10 @@
+requests-ecp (0.3.2-1) unstable; urgency=low
+
+  * update for 0.3.2
+  * use pybuild-plugin-pyproject
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Mon, 29 Apr 2024 11:07:00 +0100
+
 requests-ecp (0.3.1-1) unstable; urgency=low
 
   * update for 0.3.1

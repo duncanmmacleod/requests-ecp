@@ -1,6 +1,6 @@
 %define srcname requests-ecp
-%define distname %{lua:name = string.gsub(rpm.expand("%{srcname}"), "-", "_"); print(name)}
-%define version 0.3.1
+%global distname %{lua:name = string.gsub(rpm.expand("%{srcname}"), "[.-]", "_"); print(name)}
+%define version 0.3.2
 %define release 1
 
 # -- metadata ---------------
@@ -20,20 +20,18 @@ Version:   %{version}
 
 # -- build requirements -----
 
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
-BuildRequires: pyproject-rpm-macros
-%endif
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: python%{python3_pkgversion}-lxml
-BuildRequires: python%{python3_pkgversion}-pip
-BuildRequires: python%{python3_pkgversion}-requests
-BuildRequires: python%{python3_pkgversion}-requests-gssapi >= 1.2.2
-BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
-BuildRequires: python%{python3_pkgversion}-wheel
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 8
-BuildRequires: python%{python3_pkgversion}-pytest
-BuildRequires: python%{python3_pkgversion}-requests-mock
-%endif
+# build
+BuildRequires: python3-devel
+BuildRequires: python3dist(lxml)
+BuildRequires: python3dist(pip)
+BuildRequires: python3dist(requests)
+BuildRequires: python3dist(requests-gssapi) >= 1.2.2
+BuildRequires: python3dist(setuptools) >= 30.3.0
+BuildRequires: python3dist(wheel)
+
+# testing
+BuildRequires: python3dist(pytest)
+BuildRequires: python3dist(requests-mock)
 
 # -- packages ---------------
 
@@ -42,16 +40,16 @@ BuildRequires: python%{python3_pkgversion}-requests-mock
 requests-ecp adds optional SAML/ECP authentication support
 for the Requests Python library.
 
-%package -n python%{python3_pkgversion}-%{srcname}
+%package -n python3-%{srcname}
 Summary: %{summary}
-Requires: python%{python3_pkgversion}-lxml
-Requires: python%{python3_pkgversion}-requests
-Requires: python%{python3_pkgversion}-requests-gssapi >= 1.2.2
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
-%description -n python%{python3_pkgversion}-%{srcname}
+%description -n python3-%{srcname}
 requests-ecp adds optional SAML/ECP authentication support
 for the Requests Python library.  This package provides
 the Python %{python3_version} library.
+%files -n python3-%{srcname}
+%license LICENSE
+%doc README.md
+%{python3_sitelib}/*
 
 # -- build ------------------
 
@@ -59,7 +57,7 @@ the Python %{python3_version} library.
 %autosetup -n %{distname}-%{version}
 # for RHEL < 9 hack together setup.{cfg,py} for old setuptools
 %if 0%{?rhel} > 0 || 0%{?rhel} < 9
-cat > setup.cfg <<EOF
+cat > setup.cfg << SETUP_CFG
 [metadata]
 name = %{srcname}
 version = %{version}
@@ -70,52 +68,47 @@ license_files = LICENSE
 url = %{url}
 [options]
 packages = find:
-python_requires = >=3.5
+python_requires = >=3.6
 install_requires =
 	lxml
 	requests
-EOF
-cat > setup.py <<EOF
+SETUP_CFG
+%endif
+%if %{undefined pyproject_wheel}
+cat > setup.py << SETUP_PY
 from setuptools import setup
 setup()
-EOF
+SETUP_PY
 %endif
 
 %build
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
+%if %{defined pyproject_wheel}
 %pyproject_wheel
 %else
 %py3_build_wheel
 %endif
 
 %install
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
+%if %{defined pyproject_install}
 %pyproject_install
 %else
 %py3_install_wheel %{distname}-%{version}-*.whl
 %endif
 
 %check
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 8
 export PYTHONPATH="%{buildroot}%{python3_sitelib}"
-export PATH="%{buildroot}%{_bindir}:${PATH}"
-%{__python3} -m pip show %{srcname} -f
-%{__python3} -m pytest --verbose -ra --pyargs requests_ecp
-%endif
-
-%clean
-rm -rf $RPM_BUILD_ROOT
-
-# -- files ------------------
-
-%files -n python%{python3_pkgversion}-%{srcname}
-%license LICENSE
-%doc README.md
-%{python3_sitelib}/*
+%python3 -m pip show %{srcname} -f
+%pytest --verbose -ra --pyargs requests_ecp
 
 # -- changelog --------------
 
 %changelog
+* Mon Apr 29 2024 Duncan Macleod <duncan.macleod@ligo.org> - 0.3.2-1
+- update for 0.3.2
+- update Python macros for RHEL>=8
+- add legacy shims to pull metadata out of pyproject.toml
+- rename source rpm to python-requests-ecp
+
 * Mon Jul 17 2023 Duncan Macleod <duncan.macleod@ligo.org> - 0.3.1-1
 - update for 0.3.1
 
