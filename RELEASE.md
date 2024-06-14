@@ -46,7 +46,9 @@ with an actual release version.
 
     -   In the message box, paste the release notes, then select `Save`.
 
-    -   In the `Milestones` dropdown menu box select the matching project 
+    -   For the `Release title`, please use `requests-ecp {X.Y.Z}`.
+
+    -   In the `Milestones` dropdown menu box select the matching project
         milestone.
 
     -   In the `Release notes` text box (for the `Release`), paste the release
