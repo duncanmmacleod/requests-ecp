@@ -39,7 +39,7 @@ with an actual release version.
 
 -   Create a new Tag and Release using the GitLab UI.
 
-    -   Go to <https://git.ligo.org/computing/software/requests-ecp/-/release/new>
+    -   Go to <https://git.ligo.org/computing/software/requests-ecp/-/releases/new>
 
     -   In the `Tag name` search box, enter the version number (`{X.Y.Z}`) as
         the new tag name and select `Create tag`.
