@@ -29,46 +29,35 @@ with an actual release version.
     git push -u origin finalise-{X.Y.Z}
     ```
 
--   Open a merge request on GitHub to finalise the packaging update.
+-   Open a merge request on GitLab to finalise the packaging update.
 
-## 2. Tag the release
+## 2. Create a tag/release on GitLab
 
 -   Draft release notes by looking through the merge requests associated
     with the relevant
-    [milestone on GitHub](https://github.com/duncanmmacleod/requests-ecp/milestones).
+    [milestone on GitLab](https://git.ligo.org/computing/software/requests-ecp/-/milestones).
 
--   Create an annotated, signed tag in `git` using the release notes
-    as the tag message:
+-   Create a new Tag and Release using the GitLab UI.
 
-    ```shell
-    git tag --sign {X.Y.Z}
-    ```
+    -   Go to <https://git.ligo.org/computing/software/requests-ecp/-/release/new>
 
--   Push the tag to the project on GitLab:
+    -   In the `Tag name` search box, enter the version number (`{X.Y.Z}`) as
+        the new tag name and select `Create tag`.
 
-    ```shell
-    git push -u upstream {X.Y.Z}
-    ```
+    -   In the message box, paste the release notes, then select `Save`.
 
-## 3. Create a Release on GitHub
+    -   In the `Milestones` dropdown menu box select the matching project 
+        milestone.
 
--   Create a
-    [Release on GitLab](https://github.com/duncanmmacleod/requests-ecp/releases/new),
-    copying the same release notes from the tag message.
+    -   In the `Release notes` text box (for the `Release`), paste the release
+        notes again. (This way the release notes are visible from both the `git`
+        command-line client, _and_ the release page on the UI)
 
-    Make sure and correctly associated the correct Tag to the Release.
+    -   Under `Release Assets` add a link to the new tarball on PyPI. Use the
+        following values:
 
-## 4. Publish the new release on PyPI:
-
--   Generate a new source distribution and binary wheel for this release:
-
-    ```shell
-    git clean -dfX
-    python -m build --sdist --wheel
-    ```
-
--   Upload these distributions to PyPI:
-
-    ```shell
-    python -m twine upload --sign dist/requests-ecp-{X.Y.Z}*
-    ```
+        | Field | Value |
+        | ----- | ----- |
+        | URL | `https://pypi.io/packages/source/r/requests-ecp/requests_ecp-{X.Y.Z}.tar.gz` |
+        | Link title | `Official source distribution` |
+        | Type | `Package` |
