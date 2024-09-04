@@ -82,6 +82,10 @@ source = [
 
 [tool.pytest.ini_options]
 addopts = "-r a -v"
+filterwarnings = [
+  # error on any and all unhandled warnings
+  "error",
+]
 
 [tool.setuptools]
 license-files = [ "LICENSE" ]
