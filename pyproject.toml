@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "setuptools>=30.3.0",
+  "setuptools >=30.3.0",
   "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -21,15 +21,13 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.6",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Scientific/Engineering",
 ]
-requires-python = ">=3.6"
+requires-python = ">=3.11"
 dependencies = [
   "lxml",
   "requests",
@@ -43,11 +41,19 @@ dynamic = [
 kerberos = [
   "requests-gssapi >= 1.2.2",
 ]
-tests = [
-  "pytest >= 2.9.2",
-  "pytest-cov",
-  "requests-mock >= 1.5.0",
+
+[project.urls]
+"Bug Tracker" = "https://git.ligo.org/computing/software/requests-ecp/-/issues"
+"Documentation" = "https://requests-ecp.readthedocs.io/"
+"Source Code" = "https://git.ligo.org/computing/software/requests-ecp/"
+
+[dependency-groups]
+dev = [
+  { "include-group" = "docs" },
+  { "include-group" = "qa" },
+  { "include-group" = "tests" },
 ]
+
 docs = [
   "furo",
   "sphinx",
@@ -55,11 +61,15 @@ docs = [
   "sphinx-design",
   "sphinx_automodapi",
 ]
-
-[project.urls]
-"Bug Tracker" = "https://git.ligo.org/computing/software/requests-ecp/-/issues"
-"Documentation" = "https://requests-ecp.readthedocs.io/"
-"Source Code" = "https://git.ligo.org/computing/software/requests-ecp/"
+qa = [
+  "ruff",
+  "ty",
+]
+tests = [
+  "pytest >= 2.9.2",
+  "pytest-cov",
+  "requests-mock >= 1.5.0",
+]
 
 # -- tools
 
@@ -85,6 +95,42 @@ addopts = "-r a -v"
 filterwarnings = [
   # error on any and all unhandled warnings
   "error",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN",  # type annotations for **kwargs
+  "D203",  # blank line before class docstring
+  "D213",  # docstring summary on second line
+  "D413",  # blank line after last section
+  "PLR0913",  # too many arguments
+  "SIM108",  # if-else instead of ternary if
+]
+# allow 'mock_...' variables to go unused in tests
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?)|mock_.*)$"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-wrap-aliases = true
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+  "F401",  # unused-import
+  "F403",  # undefined-local-with-import-star
+]
+"*/tests/*" = [
+  "ANN",  # type annotations
+  "B904",  # raise from
+  "EM101",  # string literal in exception
+  "PLR2004",  # magic value used in comparison
+  "S101",  # assert
+]
+"docs/*" = [
+  "A",  # builtins
+  "ANN",  # type annotations
+  "D",  # docstrings
+  "INP001",  # implicit namespace package
 ]
 
 [tool.setuptools]
