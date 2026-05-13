@@ -37,9 +37,12 @@ def mock_authenticate_response(url):
     """
     responses = [requests.Response(), requests.Response(), requests.Response()]
     responses[0].status_code = 200  # SP PAOS request
+    responses[0].request = requests.Request("GET", url).prepare()
     responses[1].status_code = 200  # IdP SOAP response
+    responses[1].request = requests.Request("POST", url).prepare()
     responses[2].status_code = 302  # SP response
-    responses[2].headers['location'] = url
+    responses[2].request = requests.Request("POST", url).prepare()
+    responses[2].headers["location"] = url
     return responses
 
 
